@@ -1,0 +1,328 @@
+<!-- TOP UP MODAL -->
+<div id="topup-modal"
+    class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-6 animate-scale-up">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold text-lg text-gray-900">Top Up Saldo</h3>
+            <button onclick="toggleModal('topup-modal')" class="text-gray-400 hover:text-red-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="topup-form" class="space-y-4">
+            <div>
+                <label class="text-xs font-bold text-gray-700 block mb-2">Pilih Nominal <span
+                        class="text-red-500">*</span></label>
+                <div class="grid grid-cols-2 gap-2">
+                    <% [50000, 100000, 200000, 500000].forEach(function(val) { %>
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="amount" value="<%= val %>" class="peer sr-only">
+                            <div
+                                class="text-center p-3 border rounded-lg peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:text-blue-700 text-sm font-medium transition-all hover:bg-gray-50">
+                                <%= val.toLocaleString('id-ID') %>
+                            </div>
+                        </label>
+                        <% }); %>
+                </div>
+            </div>
+
+            <div>
+                <label class="text-xs font-bold text-gray-700 block mb-2">Metode Transfer <span
+                        class="text-red-500">*</span></label>
+                <select name="bank_account_id" id="topup-bank-select"
+                    class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-xs focus:outline-none focus:border-blue-500">
+                    <option disabled selected>Memuat rekening...</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="text-xs font-bold text-gray-700 block mb-2">Upload Bukti Transfer (Wajib) <span
+                        class="text-red-500">*</span></label>
+                <input type="file" name="proof_image" required accept="image/*"
+                    class="w-full text-xs border border-gray-300 rounded-lg p-2 bg-gray-50 focus:outline-none focus:border-blue-500">
+                <p class="text-[10px] text-gray-500 mt-1">Format: JPG, PNG. Maksimal 2MB.</p>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-blue-900 text-white font-bold py-3 rounded-xl hover:bg-blue-800 shadow-lg active:scale-95 transform transition-all">
+                Konfirmasi Top Up
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ORDER PAYMENT MODAL -->
+<div id="order-payment-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeOrderPaymentModal()"></div>
+    <div class="relative bg-white rounded-2xl max-w-md w-full p-6 animate-scale-up z-10 max-h-[90vh] overflow-y-auto">
+        <button onclick="closeOrderPaymentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h3 class="text-xl font-bold mb-1 text-gray-900">Pembayaran Orderan</h3>
+        <p class="text-xs text-gray-500 mb-6">Pilih metode pembayaran untuk menyelesaikan pesanan.</p>
+
+        <!-- Tabs -->
+        <div class="flex space-x-2 mb-4 border-b border-gray-100 pb-2">
+            <button onclick="switchOrderPaymentTab('balance')" id="tab-order-balance"
+                class="flex-1 py-2 text-sm font-bold text-blue-900 border-b-2 border-blue-900 transition-colors">Saldo
+                Dompet</button>
+            <button onclick="switchOrderPaymentTab('transfer')" id="tab-order-transfer"
+                class="flex-1 py-2 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-600 transition-colors">Transfer
+                Bank</button>
+        </div>
+
+        <!-- TAB 1: SALDO -->
+        <div id="content-order-balance" class="space-y-4">
+            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-blue-600 mb-1">Saldo Anda Saat Ini</p>
+                    <h4 class="text-xl font-bold text-blue-900" id="user-balance-display">Rp 0</h4>
+                </div>
+                <svg class="w-8 h-8 text-blue-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+                </svg>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600">Total Tagihan</span>
+                    <span class="text-sm font-bold text-gray-900" id="order-balance-price">Rp 0</span>
+                </div>
+                <div class="flex justify-between items-center border-t border-gray-200 pt-2">
+                    <span class="text-sm font-bold text-gray-900">Sisa Saldo Nanti</span>
+                    <span class="text-sm font-bold text-green-600" id="order-balance-remaining">Rp 0</span>
+                </div>
+            </div>
+            <div id="order-balance-warning"
+                class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-xs flex items-center">
+                <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                </svg>
+                Saldo tidak mencukupi. Silakan Top Up terlebih dahulu.
+            </div>
+            <button id="btn-pay-order-balance" onclick="processOrderBalancePayment()"
+                class="w-full bg-blue-900 text-white font-bold py-3 rounded-xl hover:bg-blue-800 transition-colors shadow-lg active:scale-95 transform">
+                Bayar Sekarang
+            </button>
+        </div>
+
+        <!-- TAB 2: TRANSFER -->
+        <div id="content-order-transfer" class="hidden space-y-4">
+            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                <p class="text-xs text-orange-800 mb-2 leading-relaxed">
+                    Silakan transfer sebesar nominal tagihan ke rekening admin, lalu upload bukti pembayarannya di sini.
+                    <br><br>
+                    <strong>Total: <span id="order-transfer-price">Rp 0</span></strong>
+                </p>
+            </div>
+            <form id="order-payment-form" onsubmit="handleOrderPaymentSubmit(event)" class="space-y-4">
+                <input type="hidden" name="order_id" id="payment-order-id">
+                <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer relative"
+                    onclick="document.getElementById('order-proof-input').click()">
+                    <input type="file" name="payment_proof" id="order-proof-input" class="hidden" accept="image/*"
+                        onchange="previewOrderPaymentImage(this)" required>
+                    <div id="order-upload-placeholder">
+                        <svg class="w-10 h-10 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p class="text-xs text-gray-500 font-bold">Klik untuk Upload Bukti</p>
+                        <p class="text-[10px] text-gray-400">JPG, PNG (Max 2MB)</p>
+                    </div>
+                    <div id="order-upload-preview" class="hidden">
+                        <img src="" class="max-h-32 mx-auto rounded-lg shadow-sm">
+                        <p class="text-[10px] text-blue-600 mt-2 font-bold">Ganti Gambar</p>
+                    </div>
+                </div>
+                <button type="submit" id="btn-submit-order-payment"
+                    class="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition-colors shadow-lg active:scale-95 transform">
+                    Kirim Bukti Pembayaran
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- QUIZ RESULT MODAL -->
+<div id="quiz-result-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeQuizResultModal()"></div>
+    <div class="relative bg-white rounded-2xl max-w-md w-full p-6 animate-scale-up z-10 max-h-[90vh] overflow-y-auto">
+        <button onclick="closeQuizResultModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h3 class="text-xl font-bold mb-4 text-gray-900">Hasil Kuis</h3>
+        <div id="quiz-result-content" class="text-center py-4">
+            <p class="text-gray-400">Memuat...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Top Up — fetch bank accounts on modal open
+    function loadBankAccounts() {
+        fetch('/bank-accounts')
+            .then(r => r.json())
+            .then(data => {
+                const select = document.getElementById('topup-bank-select');
+                if (!select) return;
+                select.innerHTML = '';
+                if (data.bankAccounts && data.bankAccounts.length > 0) {
+                    data.bankAccounts.forEach(b => {
+                        const opt = document.createElement('option');
+                        opt.value = b.id;
+                        opt.textContent = b.bank_name + ' - ' + b.account_number + ' (a.n ' + b.account_holder + ')';
+                        select.appendChild(opt);
+                    });
+                } else {
+                    select.innerHTML = '<option disabled selected>Belum ada rekening tersedia</option>';
+                }
+            }).catch(() => { });
+    }
+
+    // Top Up form submit
+    document.addEventListener('DOMContentLoaded', () => {
+        loadBankAccounts();
+        const topupForm = document.getElementById('topup-form');
+        if (topupForm) {
+            topupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(topupForm);
+                try {
+                    const res = await fetch('/topup/process', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        notify('Top up berhasil dikirim. Admin akan segera memverifikasi.', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        notify('Gagal: ' + (data.message || 'Terjadi kesalahan'), 'error');
+                    }
+                } catch (err) { notify('Kesalahan jaringan.', 'error'); }
+            });
+        }
+    });
+
+    // Order Payment Modal
+    let paymentOrder = null;
+    function openOrderPaymentModal(order) {
+        paymentOrder = order;
+        document.getElementById('payment-order-id').value = order.id;
+        switchOrderPaymentTab('balance');
+        document.getElementById('order-payment-modal').classList.remove('hidden');
+        checkOrderBalanceSufficiency(order.total_amount);
+    }
+    function closeOrderPaymentModal() { document.getElementById('order-payment-modal').classList.add('hidden'); }
+    function previewOrderPaymentImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('order-upload-placeholder').classList.add('hidden');
+                const preview = document.getElementById('order-upload-preview');
+                preview.classList.remove('hidden');
+                preview.querySelector('img').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    function switchOrderPaymentTab(tab) {
+        const bal = document.getElementById('content-order-balance');
+        const trans = document.getElementById('content-order-transfer');
+        const tabBal = document.getElementById('tab-order-balance');
+        const tabTrans = document.getElementById('tab-order-transfer');
+        if (tab === 'balance') {
+            bal.classList.remove('hidden'); trans.classList.add('hidden');
+            tabBal.classList.add('text-blue-900', 'border-blue-900'); tabBal.classList.remove('text-gray-400', 'border-transparent');
+            tabTrans.classList.add('text-gray-400', 'border-transparent'); tabTrans.classList.remove('text-blue-900', 'border-blue-900');
+            if (paymentOrder) checkOrderBalanceSufficiency(paymentOrder.total_amount);
+        } else {
+            bal.classList.add('hidden'); trans.classList.remove('hidden');
+            tabTrans.classList.add('text-blue-900', 'border-blue-900'); tabTrans.classList.remove('text-gray-400', 'border-transparent');
+            tabBal.classList.add('text-gray-400', 'border-transparent'); tabBal.classList.remove('text-blue-900', 'border-blue-900');
+        }
+    }
+    function checkOrderBalanceSufficiency(price) {
+        const currentBalance = typeof userBalance !== 'undefined' ? userBalance : 0;
+        const remaining = currentBalance - price;
+        const fmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' });
+        document.getElementById('order-balance-price').innerText = fmt.format(price);
+        document.getElementById('order-balance-remaining').innerText = fmt.format(remaining);
+        document.getElementById('order-transfer-price').innerText = fmt.format(price);
+        const warn = document.getElementById('order-balance-warning');
+        const btn = document.getElementById('btn-pay-order-balance');
+        const rem = document.getElementById('order-balance-remaining');
+        if (remaining < 0) {
+            rem.classList.add('text-red-600'); rem.classList.remove('text-green-600');
+            warn.classList.remove('hidden'); btn.disabled = true; btn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            rem.classList.add('text-green-600'); rem.classList.remove('text-red-600');
+            warn.classList.add('hidden'); btn.disabled = false; btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+    async function processOrderBalancePayment() {
+        if (!paymentOrder) return;
+        const btn = document.getElementById('btn-pay-order-balance');
+        if (btn.disabled) return;
+        
+        const confirmed = await confirmDialog('Konfirmasi Pembayaran', 'Anda yakin ingin membayar orderan ini dengan saldo dompet?', 'Bayar Sekarang');
+        if (!confirmed) return;
+
+        btn.disabled = true; btn.innerText = "Memproses...";
+        try {
+            const res = await fetch('/order/pay-balance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_id: paymentOrder.id }) });
+            const data = await res.json();
+            if (res.ok && data.success) { 
+                notify("Pembayaran Berhasil!", "success"); 
+                setTimeout(() => location.reload(), 1500);
+            }
+            else { notify("Gagal: " + (data.message || 'Terjadi kesalahan'), "error"); btn.disabled = false; btn.innerText = "Bayar Sekarang"; }
+        } catch (e) { notify("Kesalahan jaringan.", "error"); btn.disabled = false; btn.innerText = "Bayar Sekarang"; }
+    }
+    async function handleOrderPaymentSubmit(e) {
+        e.preventDefault();
+        const form = document.getElementById('order-payment-form');
+        const btn = document.getElementById('btn-submit-order-payment');
+        btn.disabled = true; btn.innerText = "Mengirim...";
+        try {
+            const res = await fetch('/order/payment', { method: 'POST', body: new FormData(form) });
+            const data = await res.json();
+            if (res.ok && data.success) { 
+                notify("Bukti pembayaran berhasil dikirim.", "success"); 
+                setTimeout(() => location.reload(), 1500);
+            }
+            else { notify("Gagal: " + (data.message || 'Terjadi kesalahan'), "error"); btn.disabled = false; btn.innerText = "Kirim Bukti Pembayaran"; }
+        } catch (e) { notify("Terjadi kesalahan jaringan.", "error"); btn.disabled = false; btn.innerText = "Kirim Bukti Pembayaran"; }
+    }
+
+    // Quiz Result Modal
+    function openQuizResult(attemptId) {
+        const modal = document.getElementById('quiz-result-modal');
+        const content = document.getElementById('quiz-result-content');
+        modal.classList.remove('hidden');
+        content.innerHTML = '<p class="text-gray-400">Memuat...</p>';
+        fetch('/quiz/result/' + attemptId)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const a = data.attempt;
+                    content.innerHTML = `
+                    <div class="text-center">
+                        <div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-3xl font-bold ${a.score >= 70 ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}">${a.score}</div>
+                        <h4 class="font-bold text-gray-900 mt-3">${a.quiz_title || 'Kuis'}</h4>
+                        <p class="text-xs text-gray-500 mt-1">${a.correct_count || 0} dari ${a.total_questions || 0} soal benar</p>
+                        <p class="text-xs text-gray-400 mt-1">Selesai: ${a.completed_at ? new Date(a.completed_at).toLocaleDateString('id-ID') : '-'}</p>
+                        ${a.score >= 70 && a.has_certificate ? '<a href="/certificate/download/' + a.id + '" class="inline-block mt-4 bg-green-600 text-white text-xs font-bold px-6 py-2 rounded-lg hover:bg-green-700">Download Sertifikat</a>' : ''}
+                    </div>`;
+                } else {
+                    content.innerHTML = '<p class="text-red-500 text-sm">' + (data.message || 'Gagal memuat hasil.') + '</p>';
+                }
+            }).catch(() => { content.innerHTML = '<p class="text-red-500 text-sm">Kesalahan jaringan.</p>'; });
+    }
+    function closeQuizResultModal() { document.getElementById('quiz-result-modal').classList.add('hidden'); }
+</script>

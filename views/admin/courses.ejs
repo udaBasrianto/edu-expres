@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %> - Edu HSI Admin
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+    <div class="min-h-screen flex flex-row">
+        <%- include('../partials/admin-sidebar', { active: 'courses' }) %>
+            <div class="flex-1 flex flex-col md:ml-64 bg-slate-50 min-h-screen">
+                <%- include('../partials/admin-header') %>
+                <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+                    <div class="mb-6 flex justify-between items-center">
+                        <div>
+                            <h1 class="text-2xl font-bold">Courses</h1>
+                            <p class="text-slate-500">Daftar kursus terbaru.</p>
+                        </div>
+                        <button onclick="document.getElementById('createCourseModal').classList.remove('hidden')"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Add Course
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead
+                                    class="text-xs text-slate-500 uppercase bg-slate-50/50 border-b border-slate-100">
+                                    <tr>
+                                        <th class="px-6 py-4 font-medium">Title</th>
+                                        <th class="px-6 py-4 font-medium">Type</th>
+                                        <th class="px-6 py-4 font-medium">Price</th>
+                                        <th class="px-6 py-4 font-medium">Created</th>
+                                        <th class="px-6 py-4 font-medium text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <% courses.forEach(function(c){ %>
+                                        <tr class="hover:bg-slate-50/80 transition-colors">
+                                            <td class="px-6 py-4 font-medium text-slate-800">
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="w-8 h-8 rounded bg-<%= c.color || 'blue' %>-100 flex items-center justify-center text-<%= c.color || 'blue' %>-600 font-bold text-xs">
+                                                        <%= c.title.charAt(0) %>
+                                                    </div>
+                                                    <%= c.title %>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-slate-600">
+                                                <span
+                                                    class="px-2 py-1 rounded text-xs font-bold <%= c.type === 'paid' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700' %>">
+                                                    <%= c.type %>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 text-slate-600">
+                                                <%= c.type==='paid' ? new Intl.NumberFormat('id-ID', { style: 'currency'
+                                                    , currency: 'IDR' }).format(c.price) : 'Free' %>
+                                            </td>
+                                            <td class="px-6 py-4 text-slate-500">
+                                                <%= new Date(c.createdAt).toLocaleString('id-ID') %>
+                                            </td>
+                                            <td class="px-6 py-4 text-right flex justify-end gap-2">
+                                                <a href="/admin/courses/<%= c.id %>/materials"
+                                                    class="text-indigo-600 hover:text-indigo-800 font-medium">Materials</a>
+                                                <button
+                                                    onclick="openEditModal('<%= c.id %>', '<%= c.title %>', '<%= c.short_desc %>', '<%= c.price %>', '<%= c.type %>', '<%= c.color %>')"
+                                                    class="text-blue-600 hover:text-blue-800 font-medium">Edit</button>
+                                                <form action="/admin/courses/delete" method="POST"
+                                                    onsubmit="return confirm('Are you sure?')" class="inline">
+                                                    <input type="hidden" name="id" value="<%= c.id %>">
+                                                    <button type="submit"
+                                                        class="text-red-600 hover:text-red-800 font-medium">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                            <% if(courses.length===0){ %>
+                                                <tr>
+                                                    <td colspan="5" class="px-6 py-8 text-center text-slate-400">No
+                                                        courses found.</td>
+                                                </tr>
+                                                <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </main>
+            </div>
+    </div>
+
+    <!-- Create Course Modal -->
+    <div id="createCourseModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
+            <h3 class="text-lg font-bold mb-4">Create New Course</h3>
+            <form action="/admin/courses/create" method="POST">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Title</label>
+                        <input type="text" name="title" required
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Short Description</label>
+                        <textarea name="short_desc" required rows="2"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Type</label>
+                            <select name="type"
+                                class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                                <option value="free">Free</option>
+                                <option value="paid">Paid</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Price (IDR)</label>
+                            <input type="number" name="price" value="0"
+                                class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Color Theme</label>
+                        <select name="color"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                            <option value="blue">Blue</option>
+                            <option value="green">Green</option>
+                            <option value="purple">Purple</option>
+                            <option value="red">Red</option>
+                            <option value="amber">Amber</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('createCourseModal').classList.add('hidden')"
+                        class="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg font-medium">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">Create
+                        Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Course Modal -->
+    <div id="editCourseModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
+            <h3 class="text-lg font-bold mb-4">Edit Course</h3>
+            <form action="/admin/courses/update" method="POST">
+                <input type="hidden" name="id" id="editCourseId">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Title</label>
+                        <input type="text" name="title" id="editCourseTitle" required
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Short Description</label>
+                        <textarea name="short_desc" id="editCourseDesc" required rows="2"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Type</label>
+                            <select name="type" id="editCourseType"
+                                class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                                <option value="free">Free</option>
+                                <option value="paid">Paid</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Price (IDR)</label>
+                            <input type="number" name="price" id="editCoursePrice"
+                                class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Color Theme</label>
+                        <select name="color" id="editCourseColor"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                            <option value="blue">Blue</option>
+                            <option value="green">Green</option>
+                            <option value="purple">Purple</option>
+                            <option value="red">Red</option>
+                            <option value="amber">Amber</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('editCourseModal').classList.add('hidden')"
+                        class="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg font-medium">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">Update
+                        Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal(id, title, desc, price, type, color) {
+            document.getElementById('editCourseId').value = id;
+            document.getElementById('editCourseTitle').value = title;
+            document.getElementById('editCourseDesc').value = desc;
+            document.getElementById('editCoursePrice').value = price;
+            document.getElementById('editCourseType').value = type;
+            document.getElementById('editCourseColor').value = color;
+            document.getElementById('editCourseModal').classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>

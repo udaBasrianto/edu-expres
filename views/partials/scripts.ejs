@@ -1,0 +1,287 @@
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    const isAuthenticated = <%= user ? 'true' : 'false' %>;
+
+    // Modern Notification Helper
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
+
+    function notify(message, icon = 'info', timer = 3000) {
+        if (icon === 'success') {
+            Toast.fire({
+                icon: 'success',
+                title: message
+            });
+        } else {
+            Swal.fire({
+                title: 'Informasi',
+                text: message,
+                icon: icon,
+                confirmButtonColor: '#1e3a8a', // blue-900
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'rounded-[28px]',
+                    confirmButton: 'rounded-xl px-8 py-3'
+                }
+            });
+        }
+    }
+
+    // Override default alert
+    window.alert = (message) => notify(message);
+
+    // Confirmation Helper
+    async function confirmDialog(title, text, confirmText = 'Ya, Lanjutkan') {
+        const result = await Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1e3a8a',
+            cancelButtonColor: '#d33',
+            confirmButtonText: confirmText,
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-[28px]',
+                confirmButton: 'rounded-xl px-8 py-3',
+                cancelButton: 'rounded-xl px-8 py-3'
+            }
+        });
+        return result.isConfirmed;
+    }
+
+    // Intercept default confirm calls for onsubmit forms
+    document.addEventListener('submit', async (e) => {
+        const form = e.target;
+        const onsubmit = form.getAttribute('onsubmit');
+        
+        if (onsubmit && onsubmit.includes('confirm(') && !form.dataset.confirmed) {
+            e.preventDefault();
+            const match = onsubmit.match(/confirm\(['"](.+?)['"]\)/);
+            const msg = match ? match[1] : 'Apakah Anda yakin?';
+            
+            const confirmed = await confirmDialog('Konfirmasi', msg);
+            if (confirmed) {
+                form.dataset.confirmed = "true";
+                form.submit();
+            }
+        }
+    });
+
+    // --- Left-Click Drag to Scroll ---
+    let isDragging = false;
+    let startX;
+    let scrollLeft;
+    let dragTarget = null;
+    let hasMoved = false;
+
+    document.addEventListener('mousedown', (e) => {
+        // button 0 is left-click
+        if (e.button !== 0) return;
+
+        const slider = e.target.closest('.overflow-x-auto, .no-scrollbar');
+        if (!slider) return;
+
+        dragTarget = slider;
+        isDragging = true;
+        hasMoved = false;
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+        
+        // Change cursor to indicate dragging
+        slider.style.cursor = 'grabbing';
+        slider.style.userSelect = 'none'; // Prevent text selection
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging || !dragTarget) return;
+        
+        const x = e.pageX - dragTarget.offsetLeft;
+        const walk = (x - startX) * 1.5; // Scroll speed multiplier
+        
+        if (Math.abs(walk) > 5) {
+            hasMoved = true;
+            dragTarget.classList.add('dragging'); // Optional class to prevent pointer-events on children
+        }
+        
+        dragTarget.scrollLeft = scrollLeft - walk;
+    });
+
+    document.addEventListener('mouseup', (e) => {
+        if (dragTarget) {
+            dragTarget.style.cursor = '';
+            dragTarget.style.userSelect = '';
+            setTimeout(() => {
+                if (dragTarget) dragTarget.classList.remove('dragging');
+                isDragging = false;
+                dragTarget = null;
+            }, 50);
+        } else {
+            isDragging = false;
+        }
+    });
+
+    // Prevent clicks on links/buttons if we actually dragged
+    document.addEventListener('click', (e) => {
+        if (hasMoved) {
+            e.preventDefault();
+            e.stopPropagation();
+            hasMoved = false;
+        }
+    }, true); // Use capture phase to intercept before children
+
+    function switchTab(tabName) {
+        localStorage.setItem('activeTab', tabName);
+
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(el => {
+            el.classList.add('hidden');
+            el.classList.remove('fade-in');
+        });
+
+        // Show selected tab
+        const target = document.getElementById('view-' + tabName);
+        if(target) {
+            target.classList.remove('hidden');
+            setTimeout(() => target.classList.add('fade-in'), 10);
+        }
+
+        // Update Bottom Nav
+        document.querySelectorAll('.nav-item').forEach(el => {
+            el.classList.remove('text-blue-900');
+            el.classList.add('text-gray-400');
+            const iconWrapper = el.querySelector('div');
+            if (iconWrapper) iconWrapper.classList.remove('scale-110');
+        });
+
+        const activeNav = document.getElementById('nav-' + tabName);
+        if (activeNav) {
+            activeNav.classList.remove('text-gray-400');
+            activeNav.classList.add('text-blue-900');
+            const iconWrapper = activeNav.querySelector('div');
+            if (iconWrapper) iconWrapper.classList.add('scale-110');
+        }
+
+        // Update Desktop Nav
+        document.querySelectorAll('.nav-link-desktop').forEach(el => {
+            el.classList.remove('text-blue-900', 'font-bold');
+            el.classList.add('text-gray-500');
+        });
+        const activeDesktop = document.querySelector(`.nav-link-desktop[data-target="${tabName}"]`);
+        if(activeDesktop) {
+            activeDesktop.classList.remove('text-gray-500');
+            activeDesktop.classList.add('text-blue-900', 'font-bold');
+        }
+
+        // Trigger specific tab logic
+        if (tabName === 'cart' && typeof loadCart === 'function') {
+            loadCart();
+        }
+    }
+
+    // Global function to update cart count
+    function updateCartCount() {
+        fetch('/cart/count')
+            .then(res => res.json())
+            .then(data => {
+                const badges = document.querySelectorAll('.cart-badge');
+                badges.forEach(b => {
+                    b.innerText = data.count;
+                    if (data.count > 0) {
+                        b.classList.remove('hidden');
+                    } else {
+                        b.classList.add('hidden');
+                    }
+                });
+            })
+            .catch(err => console.error('Failed to update cart count:', err));
+    }
+
+    // Default Tab
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        
+        let activeTab = tabParam || localStorage.getItem('activeTab') || 'home';
+        
+        // If tab is login but user is authenticated, go to home or profile
+        if (activeTab === 'login' && isAuthenticated) {
+            activeTab = 'home';
+        }
+
+        switchTab(activeTab);
+        
+        // Clean URL if tab param exists
+        if (tabParam) {
+             const newUrl = window.location.pathname;
+             window.history.replaceState({}, document.title, newUrl);
+        }
+
+        // Initialize Cart Count
+        updateCartCount();
+    });
+
+    async function handleLogout(e) {
+        e.preventDefault();
+        const confirmed = await confirmDialog('Keluar Sesi', 'Apakah Anda yakin ingin keluar dari akun ini?', 'Ya, Keluar');
+        if(!confirmed) return;
+
+        try {
+            const response = await fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                localStorage.setItem('activeTab', 'login');
+                window.location.href = result.redirect || '/?tab=login';
+            } else {
+                notify('Logout gagal', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            notify('Terjadi kesalahan', 'error');
+        }
+    }
+
+    async function handleUpdateProfile(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch('/profile/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (result.success) {
+                notify(result.message, 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                notify(result.message, 'error');
+            }
+        } catch (error) {
+            console.error('Update profile error:', error);
+            notify('Gagal memperbarui profil', 'error');
+        }
+    }
+</script>

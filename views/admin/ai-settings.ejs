@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Settings - Edu HSI Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+    <div class="min-h-screen flex flex-row">
+        <%- include('../partials/admin-sidebar', { active: 'ai-settings' }) %>
+            <div class="flex-1 flex flex-col md:ml-64 bg-slate-50 min-h-screen">
+                <%- include('../partials/admin-header') %>
+                    <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+                        <div class="flex items-center justify-between mb-8">
+                            <div>
+                                <h1 class="text-2xl font-bold text-slate-800">AI Settings</h1>
+                                <p class="text-slate-500 mt-1">Configure AI chat providers (Gemini, OpenAI, Groq, Qwen)
+                                </p>
+                            </div>
+                            <button onclick="document.getElementById('createModal').classList.remove('hidden')"
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-lg shadow-blue-200/50">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Add Provider
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <% if (aiSettings && aiSettings.length> 0) { %>
+                                <% aiSettings.forEach(function(s) { %>
+                                    <div
+                                        class="bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-100 p-6">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <h3 class="font-bold text-slate-800">
+                                                        <%= s.provider %>
+                                                    </h3>
+                                                    <p class="text-xs text-slate-500">Model: <%= s.selected_model ||
+                                                            s.models || '-' %>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span
+                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= s.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                                                <%= s.is_active ? 'Active' : 'Inactive' %>
+                                            </span>
+                                        </div>
+                                        <div class="text-xs text-slate-500 mb-4 space-y-1">
+                                            <p><strong>API Key:</strong>
+                                                <%= s.api_key ? s.api_key.substring(0, 10) + '...' : 'Not set' %>
+                                            </p>
+                                            <p><strong>System Prompt:</strong>
+                                                <%= s.system_prompt ? s.system_prompt.substring(0, 80) + '...'
+                                                    : 'Default' %>
+                                            </p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button onclick='openEditAi(<%- JSON.stringify(s) %>)'
+                                                class="flex-1 text-center py-2 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">Edit</button>
+                                            <form action="/admin/ai-settings/delete" method="POST" class="flex-1"
+                                                onsubmit="return confirm('Delete?')">
+                                                <input type="hidden" name="id" value="<%= s.id %>">
+                                                <button type="submit"
+                                                    class="w-full py-2 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <div class="col-span-full text-center py-12 text-slate-400">No AI providers
+                                                configured.</div>
+                                            <% } %>
+                        </div>
+                    </main>
+            </div>
+    </div>
+
+    <!-- Create Modal -->
+    <div id="createModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold">Add AI Provider</h3>
+                <button onclick="document.getElementById('createModal').classList.add('hidden')"
+                    class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+            </div>
+            <form action="/admin/ai-settings/create" method="POST" class="p-6 space-y-4">
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Provider</label>
+                    <select name="provider" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm">
+                        <option value="gemini">Gemini</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="groq">Groq</option>
+                        <option value="qwen">Qwen</option>
+                    </select>
+                </div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">API Key</label><input name="api_key"
+                        class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono"></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Models (comma sep)</label><input
+                        name="models" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                        placeholder="e.g. gemini-pro,gemini-1.5-flash"></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Selected Model</label><input
+                        name="selected_model" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">System Prompt</label><textarea
+                        name="system_prompt" rows="3"
+                        class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></textarea></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Reference URL</label><input
+                        name="reference_url" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></div>
+                <div class="flex items-center gap-2"><input name="is_active" type="checkbox" checked value="1"
+                        class="rounded"><label class="text-sm text-slate-700">Active</label></div>
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700">Create</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold">Edit AI Provider</h3>
+                <button onclick="document.getElementById('editModal').classList.add('hidden')"
+                    class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+            </div>
+            <form action="/admin/ai-settings/update" method="POST" class="p-6 space-y-4">
+                <input type="hidden" name="id" id="editId">
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Provider</label>
+                    <select name="provider" id="editProvider"
+                        class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm">
+                        <option value="gemini">Gemini</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="groq">Groq</option>
+                        <option value="qwen">Qwen</option>
+                    </select>
+                </div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">API Key</label><input name="api_key"
+                        id="editApiKey" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono">
+                </div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Models</label><input name="models"
+                        id="editModels" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Selected Model</label><input
+                        name="selected_model" id="editSelectedModel"
+                        class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">System Prompt</label><textarea
+                        name="system_prompt" id="editSystemPrompt" rows="3"
+                        class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></textarea></div>
+                <div><label class="block text-sm font-medium text-slate-700 mb-1">Reference URL</label><input
+                        name="reference_url" id="editRefUrl"
+                        class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"></div>
+                <div class="flex items-center gap-2"><input name="is_active" id="editIsActive" type="checkbox" value="1"
+                        class="rounded"><label class="text-sm text-slate-700">Active</label></div>
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700">Update</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function openEditAi(s) {
+            document.getElementById('editId').value = s.id;
+            document.getElementById('editProvider').value = s.provider || 'gemini';
+            document.getElementById('editApiKey').value = s.api_key || '';
+            document.getElementById('editModels').value = s.models || '';
+            document.getElementById('editSelectedModel').value = s.selected_model || '';
+            document.getElementById('editSystemPrompt').value = s.system_prompt || '';
+            document.getElementById('editRefUrl').value = s.reference_url || '';
+            document.getElementById('editIsActive').checked = s.is_active;
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>

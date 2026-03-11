@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Questions - <%= quiz.title %> - Edu HSI Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header
+            class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <a href="/admin/quizzes" class="text-slate-500 hover:text-slate-800 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                </a>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-800">
+                        <%= quiz.title %>
+                    </h1>
+                    <p class="text-xs text-slate-500">Manage Questions</p>
+                </div>
+            </div>
+            <button onclick="document.getElementById('createQuestionModal').classList.remove('hidden')"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Add Question
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 max-w-4xl mx-auto w-full">
+            <div class="space-y-6">
+                <% if (questions && questions.length> 0) { %>
+                    <% questions.forEach(function(question, index) { %>
+                        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                            <div class="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-start">
+                                <div class="flex gap-3">
+                                    <span
+                                        class="flex-none w-6 h-6 rounded bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold">
+                                        <%= index + 1 %>
+                                    </span>
+                                    <h3 class="font-medium text-slate-800 mt-0.5">
+                                        <%= question.question_text %>
+                                    </h3>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <form action="/admin/quizzes/<%= quiz.id %>/questions/delete" method="POST"
+                                        onsubmit="return confirm('Delete this question?')">
+                                        <input type="hidden" name="question_id" value="<%= question.id %>">
+                                        <button type="submit" class="text-red-500 hover:text-red-700 p-1">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <% if (question.options && question.options.length> 0) { %>
+                                    <% question.options.forEach(function(option) { %>
+                                        <div
+                                            class="flex items-center gap-3 p-3 rounded-lg border <%= option.is_correct ? 'border-green-200 bg-green-50' : 'border-slate-100 bg-white' %>">
+                                            <span
+                                                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold <%= option.is_correct ? 'bg-green-200 text-green-700' : 'bg-slate-100 text-slate-500' %>">
+                                                <%= option.label %>
+                                            </span>
+                                            <span
+                                                class="text-sm <%= option.is_correct ? 'text-green-800 font-medium' : 'text-slate-600' %>">
+                                                <%= option.text %>
+                                            </span>
+                                            <% if (option.is_correct) { %>
+                                                <svg class="w-4 h-4 text-green-600 ml-auto" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                                <% } %>
+                                        </div>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <div class="col-span-2 text-center text-slate-400 text-sm italic">No
+                                                    options defined</div>
+                                                <% } %>
+                            </div>
+                        </div>
+                        <% }) %>
+                            <% } else { %>
+                                <div
+                                    class="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-400">
+                                    <svg class="w-12 h-12 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                        </path>
+                                    </svg>
+                                    <p>No questions yet.</p>
+                                    <button
+                                        onclick="document.getElementById('createQuestionModal').classList.remove('hidden')"
+                                        class="text-blue-600 font-medium hover:underline mt-2">Add your first
+                                        question</button>
+                                </div>
+                                <% } %>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Question Modal -->
+    <div id="createQuestionModal"
+        class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 my-8">
+            <h3 class="text-lg font-bold mb-4">Add Question</h3>
+            <form action="/admin/quizzes/<%= quiz.id %>/questions/create" method="POST">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Question Text</label>
+                        <textarea name="question_text" rows="2" required
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4">
+                        <label class="block text-sm font-medium text-slate-700">Options</label>
+
+                        <!-- Option A -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center h-10">
+                                <input type="radio" name="correct_option" value="A" required
+                                    class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                            </div>
+                            <div class="flex-1">
+                                <div class="relative">
+                                    <span
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 font-bold text-xs">A</span>
+                                    <input type="text" name="option_a" required placeholder="Option A text"
+                                        class="w-full pl-8 rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Option B -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center h-10">
+                                <input type="radio" name="correct_option" value="B" required
+                                    class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                            </div>
+                            <div class="flex-1">
+                                <div class="relative">
+                                    <span
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 font-bold text-xs">B</span>
+                                    <input type="text" name="option_b" required placeholder="Option B text"
+                                        class="w-full pl-8 rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Option C -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center h-10">
+                                <input type="radio" name="correct_option" value="C" required
+                                    class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                            </div>
+                            <div class="flex-1">
+                                <div class="relative">
+                                    <span
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 font-bold text-xs">C</span>
+                                    <input type="text" name="option_c" required placeholder="Option C text"
+                                        class="w-full pl-8 rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Option D -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center h-10">
+                                <input type="radio" name="correct_option" value="D" required
+                                    class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+                            </div>
+                            <div class="flex-1">
+                                <div class="relative">
+                                    <span
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 font-bold text-xs">D</span>
+                                    <input type="text" name="option_d" required placeholder="Option D text"
+                                        class="w-full pl-8 rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Order</label>
+                        <input type="number" name="order" value="<%= (questions ? questions.length + 1 : 1) %>"
+                            class="w-24 rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button"
+                        onclick="document.getElementById('createQuestionModal').classList.add('hidden')"
+                        class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition-colors">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">Save
+                        Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

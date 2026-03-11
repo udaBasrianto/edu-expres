@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= post.title %> - HSI Edu
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .prose h1,
+        .prose h2,
+        .prose h3 {
+            font-weight: 700;
+            color: #1a202c;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        .prose h1 {
+            font-size: 1.5rem;
+        }
+
+        .prose h2 {
+            font-size: 1.25rem;
+        }
+
+        .prose h3 {
+            font-size: 1.1rem;
+        }
+
+        .prose p {
+            margin-bottom: 1em;
+        }
+
+        .prose ul,
+        .prose ol {
+            margin-left: 1.5em;
+            margin-bottom: 1em;
+        }
+
+        .prose li {
+            margin-bottom: 0.25em;
+        }
+
+        .prose a {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .prose img {
+            border-radius: 0.5rem;
+            margin: 1em 0;
+        }
+
+        .prose blockquote {
+            border-left: 4px solid #e5e7eb;
+            padding-left: 1em;
+            color: #6b7280;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen pb-24">
+
+    <!-- Modern Native Header -->
+    <header class="bg-white/90 backdrop-blur-xl sticky top-0 z-50 border-b border-slate-100 px-5 h-16 flex items-center justify-between shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+        <div class="flex items-center gap-4 min-w-0">
+            <a href="/" class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 active:scale-90 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </a>
+            <h1 class="font-black text-sm text-slate-800 truncate tracking-tight">Detail Artikel</h1>
+        </div>
+        <button type="button" onclick="sharePost()" class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 active:scale-90 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+            </svg>
+        </button>
+    </header>
+
+    <main class="max-w-md mx-auto">
+        <!-- Hero Section -->
+        <% if (post.image) { %>
+            <div class="w-full aspect-[16/10] relative overflow-hidden">
+                <img src="<%= post.image.startsWith('http') ? post.image : '/uploads/' + post.image %>" alt="<%= post.title %>" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+                <div class="absolute bottom-6 left-6 right-6">
+                    <% if (post.category && post.category.name) { %>
+                        <span class="inline-block px-3 py-1 bg-blue-600/90 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest rounded-lg mb-3 shadow-lg">
+                            <%= post.category.name %>
+                        </span>
+                    <% } %>
+                    <h1 class="text-xl font-black text-white leading-tight tracking-tight drop-shadow-md">
+                        <%= post.title %>
+                    </h1>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- Content Card -->
+        <article class="px-5 -mt-6 relative z-10 pb-12">
+            <div class="bg-white rounded-[32px] shadow-xl shadow-blue-900/5 p-6 border border-slate-100 min-h-[400px]">
+                <div class="flex items-center justify-between mb-8 pb-6 border-b border-slate-50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-50 border border-slate-100 flex items-center justify-center text-blue-600 font-black text-xs shadow-sm">A</div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-800 uppercase tracking-widest leading-none mb-1">Admin Edu</p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter leading-none">Penulis Artikel</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-black text-slate-800 leading-none mb-1"><%= post.created_at ? new Date(post.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '' %></p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter leading-none">Diterbitkan</p>
+                    </div>
+                </div>
+
+                <div class="prose prose-slate prose-sm max-w-none text-slate-600 leading-relaxed font-medium">
+                    <%- post.content || '<p class="text-center py-10 text-slate-300 italic">Tidak ada konten tersedia.</p>' %>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <div id="shareToast" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-50 hidden">
+        <div class="bg-gray-900 text-white text-sm px-4 py-2 rounded-full shadow-lg">
+            Link berhasil disalin
+        </div>
+    </div>
+
+    <script>
+        function showShareToast(message) {
+            const el = document.getElementById('shareToast');
+            if (!el) return;
+            const inner = el.querySelector('div');
+            if (inner) inner.textContent = message || 'Link berhasil disalin';
+            el.classList.remove('hidden');
+            clearTimeout(window.__shareToastTimer);
+            window.__shareToastTimer = setTimeout(() => {
+                el.classList.add('hidden');
+            }, 2200);
+        }
+
+        async function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+                return true;
+            }
+
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.top = '-1000px';
+            textarea.style.left = '-1000px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length);
+            let ok = false;
+            try {
+                ok = document.execCommand('copy');
+            } catch (e) {
+                ok = false;
+            }
+            document.body.removeChild(textarea);
+            return ok;
+        }
+
+        async function sharePost() {
+            const url = window.location.href;
+            const title = document.querySelector('article h1')?.innerText || document.title || 'HSI Edu';
+            const subtitle = document.querySelector('img[alt]')?.getAttribute('alt') || '';
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title, text: subtitle, url });
+                    return;
+                } catch (e) {
+                }
+            }
+
+            try {
+                const ok = await copyToClipboard(url);
+                showShareToast(ok ? 'Link berhasil disalin' : 'Gagal menyalin link');
+            } catch (e) {
+                showShareToast('Gagal menyalin link');
+            }
+        }
+    </script>
+</body>
+
+</html>

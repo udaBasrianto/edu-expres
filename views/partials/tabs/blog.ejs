@@ -1,0 +1,219 @@
+<!-- ======================= -->
+<!-- TAB: ARTIKEL (BLOG)     -->
+<!-- ======================= -->
+<div id="view-blog" class="tab-content hidden fade-in bg-slate-50 min-h-screen">
+    <!-- Modern Native Header -->
+    <div class="sticky top-0 bg-white/90 backdrop-blur-xl z-30 px-5 pt-4 pb-3 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] border-b border-slate-100">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-black text-slate-800 tracking-tight">Artikel & Berita</h2>
+            <div class="flex items-center gap-2">
+                <div class="flex bg-slate-100 rounded-xl p-1 border border-slate-200/50 shadow-inner">
+                    <button onclick="setBlogLayout('list')" id="btn-layout-list"
+                        class="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 transition-all active:scale-90">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <button onclick="setBlogLayout('grid-2')" id="btn-layout-grid-2"
+                        class="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 transition-all active:scale-90">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Native Search UI -->
+        <div class="relative group mb-4">
+            <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+            </div>
+            <input type="text" id="blog-search" placeholder="Cari artikel atau tutorial..." 
+                class="w-full bg-slate-50 border-none rounded-2xl py-3.5 pl-11 pr-4 text-xs font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-blue-600/10 focus:bg-white transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+        </div>
+
+        <!-- Filter Tabs (Horizontal) -->
+        <div class="flex overflow-x-auto gap-2 pb-1 no-scrollbar">
+            <button onclick="filterBlog('all', this)" class="blog-filter-btn px-4 py-2 rounded-xl bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest whitespace-nowrap shadow-lg shadow-blue-600/20 transition-all">Semua</button>
+            <button onclick="filterBlog('Inspirasi', this)" class="blog-filter-btn px-4 py-2 rounded-xl bg-white text-slate-400 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border border-slate-100 transition-all active:scale-95">Inspirasi</button>
+            <button onclick="filterBlog('Tutorial', this)" class="blog-filter-btn px-4 py-2 rounded-xl bg-white text-slate-400 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border border-slate-100 transition-all active:scale-95">Tutorial</button>
+            <button onclick="filterBlog('Tips', this)" class="blog-filter-btn px-4 py-2 rounded-xl bg-white text-slate-400 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border border-slate-100 transition-all active:scale-95">Tips</button>
+        </div>
+    </div>
+
+    <div id="blog-container" class="px-5 py-6 pb-28 grid gap-5 transition-all duration-500 grid-cols-1">
+        <% if (typeof blogPosts !=='undefined' && blogPosts && blogPosts.length> 0) { %>
+            <% blogPosts.forEach(function(post, index) { %>
+                <article
+                    class="blog-item bg-white rounded-[28px] shadow-sm border border-slate-100 overflow-hidden group cursor-pointer active:scale-[0.98] transition-all flex flex-col fade-in"
+                    data-category="<%= (post.category && post.category.name) ? post.category.name : 'Umum' %>"
+                    onclick="window.location.href='/post/<%= post.slug %>'">
+                    <div class="blog-image-container aspect-[16/10] w-full overflow-hidden bg-slate-100 relative">
+                        <% if (post.image) { %>
+                            <img src="<%= post.image.startsWith('http') ? post.image : '/uploads/' + post.image %>"
+                                class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                onerror="this.onerror=null; this.src='https://via.placeholder.com/800x500?text=No+Image';">
+                            <% } else { %>
+                                <div class="w-full h-full flex items-center justify-center text-slate-300 bg-gradient-to-br from-slate-50 to-slate-100">
+                                    <svg class="w-12 h-12 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <% } %>
+                                <div class="absolute top-4 right-4 z-10">
+                                    <span class="text-[9px] font-black text-white bg-blue-600/90 backdrop-blur-md px-3 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-blue-600/20">
+                                        <%= (post.category && post.category.name) ? post.category.name : 'Umum' %>
+                                    </span>
+                                </div>
+                    </div>
+                    <div class="blog-content-container p-5 flex-1 flex flex-col">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                                <%= post.created_at ? new Date(post.created_at).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'}) : '' %>
+                            </span>
+                            <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">5 Menit Baca</span>
+                        </div>
+                        <h3 class="font-black text-slate-800 text-base mb-2 line-clamp-2 leading-tight tracking-tight group-hover:text-blue-600 transition-colors">
+                            <%= post.title %>
+                        </h3>
+                        <p class="text-[11px] text-slate-400 line-clamp-2 mb-4 leading-relaxed font-medium">
+                            <%= post.excerpt || '' %>
+                        </p>
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-[10px] font-black text-blue-600 border border-white shadow-sm">
+                                    A
+                                </div>
+                                <span class="text-[10px] font-black text-slate-600 uppercase tracking-tighter">Admin Edu</span>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <% }); %>
+                    <% } else { %>
+                        <div class="col-span-full text-center py-20 bg-white rounded-[32px] border border-slate-100">
+                            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                                <svg class="w-8 h-8 text-slate-300 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Belum ada artikel yang diterbitkan.</p>
+                        </div>
+                        <% } %>
+    </div>
+</div>
+
+<script>
+    function setBlogLayout(layout) {
+        const container = document.getElementById('blog-container');
+        if (!container) return;
+        const items = container.querySelectorAll('.blog-item');
+        const btnList = document.getElementById('btn-layout-list');
+        const btnGrid2 = document.getElementById('btn-layout-grid-2');
+        
+        [btnList, btnGrid2].forEach(btn => { 
+            if (btn) {
+                btn.classList.remove('bg-white', 'text-blue-600', 'shadow-md', 'ring-1', 'ring-slate-200/50'); 
+                btn.classList.add('text-slate-400');
+            }
+        });
+        
+        if (layout === 'list' && btnList) {
+            btnList.classList.add('bg-white', 'text-blue-600', 'shadow-md', 'ring-1', 'ring-slate-200/50');
+            btnList.classList.remove('text-slate-400');
+        }
+        if (layout === 'grid-2' && btnGrid2) {
+            btnGrid2.classList.add('bg-white', 'text-blue-600', 'shadow-md', 'ring-1', 'ring-slate-200/50');
+            btnGrid2.classList.remove('text-slate-400');
+        }
+
+        container.classList.remove('grid-cols-1', 'grid-cols-2', 'gap-5', 'gap-3');
+        
+        items.forEach(item => {
+            const img = item.querySelector('.blog-image-container');
+            const content = item.querySelector('.blog-content-container');
+            item.classList.remove('flex-row', 'items-center', 'p-2');
+            item.classList.add('flex-col');
+            
+            if (img) { 
+                img.classList.remove('w-28', 'h-28', 'shrink-0', 'm-3', 'rounded-2xl'); 
+                img.classList.add('aspect-[16/10]', 'w-full'); 
+            }
+            if (content) { 
+                content.classList.remove('p-0', 'py-1', 'pr-4'); 
+                content.classList.add('p-5'); 
+            }
+
+            if (layout === 'list') {
+                item.classList.remove('flex-col');
+                item.classList.add('flex-row', 'items-center');
+                if (img) { 
+                    img.classList.remove('aspect-[16/10]', 'w-full'); 
+                    img.classList.add('w-28', 'h-28', 'shrink-0', 'm-3', 'rounded-2xl'); 
+                }
+                if (content) { 
+                    content.classList.remove('p-5'); 
+                    content.classList.add('p-0', 'py-1', 'pr-4'); 
+                }
+            }
+        });
+
+        if (layout === 'grid-2') container.classList.add('grid-cols-2', 'gap-4');
+        else if (layout === 'list') container.classList.add('grid-cols-1', 'gap-4');
+        else container.classList.add('grid-cols-1', 'gap-5');
+        
+        localStorage.setItem('blogLayout', layout);
+    }
+    function filterBlog(category, btn) {
+        // Update buttons
+        document.querySelectorAll('.blog-filter-btn').forEach(b => {
+            b.classList.remove('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-600/20');
+            b.classList.add('bg-white', 'text-slate-400', 'border-slate-100');
+        });
+        btn.classList.add('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-600/20');
+        btn.classList.remove('bg-white', 'text-slate-400', 'border-slate-100');
+
+        const items = document.querySelectorAll('.blog-item');
+        items.forEach(item => {
+            if (category === 'all' || item.dataset.category === category) {
+                item.classList.remove('hidden');
+            } else {
+                item.classList.add('hidden');
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedLayout = localStorage.getItem('blogLayout') || 'grid-1';
+        setBlogLayout(savedLayout);
+
+        // Search logic
+        const searchInput = document.getElementById('blog-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const items = document.querySelectorAll('.blog-item');
+                items.forEach(item => {
+                    const title = item.querySelector('h3').innerText.toLowerCase();
+                    const excerpt = item.querySelector('p').innerText.toLowerCase();
+                    if (title.includes(term) || excerpt.includes(term)) {
+                        item.classList.remove('hidden');
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+            });
+        }
+    });
+</script>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Materials - <%= course.title %> - Edu HSI Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <a href="/admin/courses" class="text-slate-500 hover:text-slate-800 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </a>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-800"><%= course.title %></h1>
+                    <p class="text-xs text-slate-500">Manage Materials</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="document.getElementById('createMaterialModal').classList.remove('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add Material
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 max-w-5xl mx-auto w-full">
+            
+            <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+                <% if (materials.length > 0) { %>
+                    <div class="divide-y divide-slate-100">
+                        <% materials.forEach(function(material, index) { %>
+                        <div class="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors group">
+                            <div class="flex-none w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs">
+                                <%= index + 1 %>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-medium text-slate-900 truncate"><%= material.title %></h3>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider 
+                                        <%= material.type === 'video' ? 'bg-red-100 text-red-700' : 
+                                           material.type === 'quiz' ? 'bg-purple-100 text-purple-700' : 
+                                           'bg-blue-100 text-blue-700' %>">
+                                        <%= material.type %>
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-500 truncate">
+                                    <% if (material.type === 'video') { %>
+                                        URL: <%= material.media_url %>
+                                    <% } else if (material.type === 'quiz' && material.quiz) { %>
+                                        Quiz: <%= material.quiz.title %>
+                                    <% } else { %>
+                                        Link: <%= material.link %>
+                                    <% } %>
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <form action="/admin/courses/<%= course.id %>/materials/delete" method="POST" onsubmit="return confirm('Delete this material?')">
+                                    <input type="hidden" name="id" value="<%= material.id %>">
+                                    <button type="submit" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <div class="p-12 text-center text-slate-400">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        <p>No materials yet.</p>
+                        <button onclick="document.getElementById('createMaterialModal').classList.remove('hidden')" class="text-blue-600 font-medium hover:underline mt-2">Add your first material</button>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Material Modal -->
+    <div id="createMaterialModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
+            <h3 class="text-lg font-bold mb-4">Add Material</h3>
+            <form action="/admin/courses/<%= course.id %>/materials/create" method="POST">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Title</label>
+                        <input type="text" name="title" required class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Type</label>
+                        <select name="type" id="materialType" onchange="toggleFields()" class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                            <option value="video">Video</option>
+                            <option value="pdf">Document (PDF)</option>
+                            <option value="quiz">Quiz</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Video/Link Fields -->
+                    <div id="urlField">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Media URL / Link</label>
+                        <input type="text" name="media_url" placeholder="https://youtube.com/..." class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+
+                    <div id="durationField">
+                         <label class="block text-sm font-medium text-slate-700 mb-1">Duration (e.g. "10:00" or "5 min")</label>
+                         <input type="text" name="duration" class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                    </div>
+
+                    <!-- Quiz Field -->
+                    <div id="quizField" class="hidden">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Select Quiz</label>
+                        <select name="quiz_id" class="w-full rounded-lg border-slate-300 border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                            <option value="">-- Select a Quiz --</option>
+                            <% quizzes.forEach(function(quiz) { %>
+                                <option value="<%= quiz.id %>"><%= quiz.title %></option>
+                            <% }) %>
+                        </select>
+                        <p class="text-xs text-slate-500 mt-1">Select a quiz to attach to this material.</p>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('createMaterialModal').classList.add('hidden')" class="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">Add Material</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleFields() {
+            const type = document.getElementById('materialType').value;
+            const urlField = document.getElementById('urlField');
+            const quizField = document.getElementById('quizField');
+            const durationField = document.getElementById('durationField');
+
+            if (type === 'quiz') {
+                urlField.classList.add('hidden');
+                durationField.classList.add('hidden');
+                quizField.classList.remove('hidden');
+            } else {
+                urlField.classList.remove('hidden');
+                durationField.classList.remove('hidden');
+                quizField.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

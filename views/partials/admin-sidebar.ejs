@@ -1,0 +1,176 @@
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Modern Notification Helper for Admin
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
+
+    function notify(message, icon = 'info') {
+        if (icon === 'success') {
+            Toast.fire({ icon: 'success', title: message });
+        } else {
+            Swal.fire({
+                title: 'Admin System',
+                text: message,
+                icon: icon,
+                confirmButtonColor: '#2563eb', // blue-600
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+    // Override default alert
+    window.alert = (message) => notify(message);
+
+    async function confirmDialog(title, text, confirmText = 'Ya, Lanjutkan') {
+        const result = await Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2563eb',
+            cancelButtonColor: '#dc2626',
+            confirmButtonText: confirmText,
+            cancelButtonText: 'Batal'
+        });
+        return result.isConfirmed;
+    }
+
+    // Intercept default confirm calls for onsubmit forms
+    document.addEventListener('submit', async (e) => {
+        const form = e.target;
+        const onsubmit = form.getAttribute('onsubmit');
+        
+        // Match both single and double quotes
+        if (onsubmit && onsubmit.includes('confirm(') && !form.dataset.confirmed) {
+            e.preventDefault();
+            const match = onsubmit.match(/confirm\(['"](.+?)['"]\)/);
+            const msg = match ? match[1] : 'Apakah Anda yakin?';
+            
+            const confirmed = await confirmDialog('Konfirmasi Admin', msg);
+            if (confirmed) {
+                form.dataset.confirmed = "true";
+                form.submit();
+            }
+        }
+    });
+
+    // Mobile Sidebar Toggle Logic
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('admin-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const toggleBtn = document.getElementById('mobileSidebarToggle');
+        const closeBtn = document.getElementById('closeSidebar');
+
+        if (toggleBtn && sidebar) {
+            toggleBtn.onclick = (e) => {
+                e.preventDefault();
+                sidebar.classList.remove('-translate-x-full');
+                if (overlay) overlay.classList.remove('hidden');
+            };
+        }
+
+        if (closeBtn && sidebar) {
+            closeBtn.onclick = () => {
+                sidebar.classList.add('-translate-x-full');
+                if (overlay) overlay.classList.add('hidden');
+            };
+        }
+
+        if (overlay && sidebar) {
+            overlay.onclick = () => {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            };
+        }
+    });
+</script>
+
+<!-- Mobile Overlay -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden transition-opacity"></div>
+
+<!-- Sidebar -->
+<aside id="admin-sidebar" class="w-64 bg-white border-r border-slate-200 fixed h-full z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col">
+    <div class="h-16 flex items-center justify-between px-6 border-b border-slate-100 shrink-0">
+        <div class="flex items-center gap-2 text-blue-700">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z"/></svg>
+            <span class="text-xl font-bold tracking-tight">EduHSI Admin</span>
+        </div>
+        <button id="closeSidebar" class="md:hidden p-2 text-slate-400 hover:text-slate-600 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-4">
+        <ul class="space-y-1">
+            <li><a href="/admin" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'dashboard') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard</a></li>
+            <li><a href="/admin/users" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'users') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Users</a></li>
+            <li><a href="/admin/courses" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'courses') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                Courses</a></li>
+            <li><a href="/admin/quizzes" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'quizzes') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Quizzes</a></li>
+
+            <li class="pt-4 mt-4 border-t border-slate-100">
+                <span class="px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">E-Commerce</span>
+            </li>
+            <li><a href="/admin/products" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'products') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                Products</a></li>
+            <li><a href="/admin/orders" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'orders') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                Orders</a></li>
+            <li><a href="/admin/deposits" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'deposits') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Deposits</a></li>
+            <li><a href="/admin/bank-accounts" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'bank-accounts') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                Bank Accounts</a></li>
+            <li><a href="/admin/product-messages" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'product-messages') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                Messages</a></li>
+
+            <li class="pt-4 mt-4 border-t border-slate-100">
+                <span class="px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">Content</span>
+            </li>
+            <li><a href="/admin/posts" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'posts') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                Posts</a></li>
+            <li><a href="/admin/banners" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'banners') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Banners</a></li>
+
+            <li class="pt-4 mt-4 border-t border-slate-100">
+                <span class="px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider">System</span>
+            </li>
+            <li><a href="/admin/analytics" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'analytics') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Analytics</a></li>
+            <li><a href="/admin/ai-settings" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'ai-settings') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                AI Settings</a></li>
+            <li><a href="/admin/app-settings" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'app-settings') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                App Settings</a></li>
+            <li><a href="/admin/settings" class="flex items-center gap-3 px-6 py-3 text-sm font-medium <%= (typeof active !== 'undefined' && active === 'settings') ? 'text-blue-600 bg-blue-50 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' %>">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                Settings</a></li>
+        </ul>
+    </nav>
+    <div class="p-4 border-t border-slate-100">
+        <a href="/" class="flex items-center justify-center gap-2 w-full py-2 px-4 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors shadow-lg shadow-slate-300/50">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to App
+        </a>
+    </div>
+</aside>

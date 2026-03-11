@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>
+        <%= appSettings.app_name || 'Edu HSI' %>
+    </title>
+    <!-- PWA -->
+    <meta name="theme-color" content="#1e3a8a">
+    <link rel="manifest" href="/manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
+
+    <%- include('partials/styles') %>
+</head>
+
+<body class="bg-gray-100 text-gray-800 antialiased">
+
+    <!-- App Container -->
+    <div id="app-container"
+        class="mx-auto w-full max-w-md md:max-w-2xl lg:max-w-7xl bg-white min-h-screen relative shadow-2xl overflow-x-hidden transition-all duration-300">
+
+        <!-- TABLET/DESKTOP HEADER -->
+        <header
+            class="hidden md:flex justify-between items-center px-8 py-4 bg-white shadow-sm sticky top-0 z-40 border-b border-gray-100">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <img src="https://ui-avatars.com/api/?name=Edu+HSI&background=1e3a8a&color=fff&size=40"
+                    class="w-10 h-10 rounded-lg" alt="Logo">
+                <div>
+                    <h1 class="font-bold text-lg text-blue-900">
+                        <%= appSettings.app_name || 'Edu HSI' %>
+                    </h1>
+                    <p class="text-[10px] text-gray-500">Belajar Di Mana Saja</p>
+                </div>
+            </div>
+
+            <!-- DESKTOP NAV -->
+            <nav class="hidden lg:flex items-center space-x-8">
+                <a href="#" onclick="event.preventDefault(); switchTab('home')"
+                    class="nav-link-desktop text-gray-500 hover:text-blue-900 font-medium transition-colors"
+                    data-target="home">Beranda</a>
+                <a href="#" onclick="event.preventDefault(); switchTab('academy')"
+                    class="nav-link-desktop text-gray-500 hover:text-blue-900 font-medium transition-colors"
+                    data-target="academy">Akademi</a>
+                <a href="#" onclick="event.preventDefault(); switchTab('reguler')"
+                    class="nav-link-desktop text-gray-500 hover:text-blue-900 font-medium transition-colors"
+                    data-target="reguler">Reguler</a>
+                <a href="#" onclick="event.preventDefault(); switchTab('blog')"
+                    class="nav-link-desktop text-gray-500 hover:text-blue-900 font-medium transition-colors"
+                    data-target="blog">Blog</a>
+                <a href="#" onclick="event.preventDefault(); switchTab('profile')"
+                    class="nav-link-desktop text-gray-500 hover:text-blue-900 font-medium transition-colors"
+                    data-target="profile">Profil</a>
+                <% if (user && user.role==='admin' ) { %>
+                    <a href="/admin"
+                        class="nav-link-desktop text-gray-500 hover:text-blue-900 font-medium transition-colors">Admin</a>
+                    <% } %>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <% if (user) { %>
+                    <button
+                        class="bg-blue-900 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-800 transition-colors flex items-center shadow-md active:scale-95">
+                        Top Up
+                    </button>
+                    <% } %>
+                        <a href="/?tab=cart" onclick="event.preventDefault(); switchTab('cart');"
+                            class="relative p-2 text-gray-500 hover:text-blue-900 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-6 h-6">
+                                <path fill-rule="evenodd"
+                                    d="M7.5 6v.75H5.513c-.96 0-1.764.724-1.865 1.679l-1.263 12A1.875 1.875 0 004.25 22.5h15.5a1.875 1.875 0 001.865-2.071l-1.263-12a1.875 1.875 0 00-1.865-1.679H16.5V6a4.5 4.5 0 10-9 0zM12 3a3 3 0 00-3 3v.75h6V6a3 3 0 00-3-3zm-3 8.25a3 3 0 106 0v-.75a.75.75 0 011.5 0v.75a4.5 4.5 0 11-9 0v-.75a.75.75 0 011.5 0v.75z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span
+                                class="cart-badge absolute top-1 right-0 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                        </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="pb-24 lg:pb-8 lg:px-4">
+            <%- include('partials/tabs/home') %>
+                <%- include('partials/tabs/academy') %>
+                    <%- include('partials/tabs/cart') %>
+                        <%- include('partials/tabs/profile') %>
+                            <%- include('partials/tabs/login') %>
+                                <%- include('partials/tabs/signup') %>
+                                    <%- include('partials/tabs/quiz') %>
+                                        <%- include('partials/tabs/course-detail') %>
+                                            <%- include('partials/tabs/blog') %>
+                                                <%- include('partials/tabs/regular') %>
+        </div>
+        <!-- Modals -->
+        <%- include('partials/modals') %>
+    </div>
+
+    </div>
+
+    <%- include('partials/bottom-nav') %>
+        <%- include('partials/scripts') %>
+
+</body>
+
+</html>

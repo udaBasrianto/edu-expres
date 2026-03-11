@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= quiz.title %> - Kuis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-20">
+        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="/?tab=quiz" class="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </a>
+                <div>
+                    <h1 class="font-bold text-gray-900 text-lg line-clamp-1"><%= quiz.title %></h1>
+                    <p class="text-xs text-gray-500"><%= quiz.questions.length %> Soal • <%= quiz.duration_minutes %> Menit</p>
+                </div>
+            </div>
+            <div class="text-blue-900 font-bold text-sm" id="timer">00:00</div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="max-w-3xl mx-auto px-4 py-8 pb-24">
+        <form id="quiz-form" onsubmit="submitQuiz(event)">
+            <input type="hidden" name="quizId" value="<%= quiz.id %>">
+            
+            <div class="space-y-6">
+                <% quiz.questions.forEach((question, index) => { %>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex gap-4">
+                            <span class="flex-none w-8 h-8 bg-blue-50 text-blue-900 rounded-full flex items-center justify-center font-bold text-sm">
+                                <%= index + 1 %>
+                            </span>
+                            <div class="flex-1">
+                                <p class="text-gray-900 font-medium text-lg mb-4"><%= question.question_text %></p>
+                                
+                                <div class="space-y-3">
+                                    <% question.options.forEach(option => { %>
+                                        <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors">
+                                            <input type="radio" name="answers[<%= question.id %>]" value="<%= option.id %>" class="w-4 h-4 text-blue-900 focus:ring-blue-900" required>
+                                            <span class="text-gray-700"><%= option.text %></span>
+                                        </label>
+                                    <% }); %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <div class="max-w-3xl mx-auto">
+                    <button type="submit" class="w-full bg-blue-900 text-white font-bold py-3 rounded-xl shadow hover:bg-blue-800 transition-colors active:scale-95">
+                        Kirim Jawaban
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl p-6 text-center shadow-xl transform transition-all scale-100">
+            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Kuis Selesai!</h2>
+            <p class="text-gray-500 mb-6" id="result-message">Anda menjawab X dari Y soal dengan benar.</p>
+            
+            <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                <p class="text-sm text-gray-500 mb-1">Nilai Akhir</p>
+                <p class="text-4xl font-bold text-blue-900" id="result-score">0</p>
+            </div>
+
+            <a href="/?tab=quiz" class="block w-full bg-blue-900 text-white font-bold py-3 rounded-xl hover:bg-blue-800 transition-colors">
+                Kembali ke Daftar Kuis
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Simple Timer
+        let duration = <%= quiz.duration_minutes %> * 60;
+        const timerEl = document.getElementById('timer');
+        
+        const interval = setInterval(() => {
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
+            timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (duration <= 0) {
+                clearInterval(interval);
+                notify('Waktu habis!', 'warning');
+                setTimeout(() => {
+                    document.getElementById('quiz-form').submit();
+                }, 1500);
+            }
+            duration--;
+        }, 1000);
+
+        async function submitQuiz(e) {
+            e.preventDefault();
+            const confirmed = await confirmDialog('Kirim Jawaban', 'Apakah Anda yakin ingin mengirim semua jawaban Anda?', 'Ya, Kirim');
+            if (!confirmed) return;
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = {
+                quizId: formData.get('quizId'),
+                answers: {}
+            };
+
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('answers[')) {
+                    const questionId = key.match(/\[(\d+)\]/)[1];
+                    data.answers[questionId] = value;
+                }
+            }
+
+            const btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerText = 'Memproses...';
+
+            try {
+                const res = await fetch('/quiz/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    notify('Kuis Selesai!', 'success');
+                    document.getElementById('result-message').innerText = result.message;
+                    document.getElementById('result-score').innerText = Math.round(result.score);
+                    document.getElementById('result-modal').classList.remove('hidden');
+                } else {
+                    notify(result.message, 'error');
+                    btn.disabled = false;
+                    btn.innerText = 'Kirim Jawaban';
+                }
+            } catch (error) {
+                console.error(error);
+                notify('Terjadi kesalahan saat mengirim jawaban', 'error');
+                btn.disabled = false;
+                btn.innerText = 'Kirim Jawaban';
+            }
+        }
+    </script>
+</body>
+</html>

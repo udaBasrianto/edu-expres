@@ -1,0 +1,35 @@
+<div id="view-quiz" class="tab-content hidden">
+    <!-- Header Quiz (Sticky) -->
+    <div class="sticky top-0 bg-teal-600 z-10 px-4 py-3 shadow-md border-b border-teal-700 flex items-center justify-between text-white">
+        <h2 class="text-lg font-bold">Kuis & Latihan</h2>
+    </div>
+
+    <section class="px-4 py-5">
+        
+        <% if (quizzesJson && quizzesJson.length > 0) { %>
+            <div class="space-y-4">
+                <% quizzesJson.forEach(quiz => { %>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-gray-900 mb-1"><%= quiz.title %></h3>
+                            <p class="text-xs text-gray-500 mb-2"><%= quiz.description || 'Tidak ada deskripsi' %></p>
+                            <span class="inline-block bg-blue-50 text-blue-800 text-[10px] font-bold px-2 py-1 rounded">
+                                <%= quiz.duration_minutes %> Menit
+                            </span>
+                        </div>
+                        <a href="/quiz/<%= quiz.id %>" class="bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-blue-800 transition-colors">
+                            Mulai
+                        </a>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div class="bg-white p-10 rounded-xl shadow-sm border border-gray-100 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto text-gray-300 mb-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                </svg>
+                <p class="text-gray-500">Belum ada kuis yang tersedia saat ini.</p>
+            </div>
+        <% } %>
+    </section>
+</div>
