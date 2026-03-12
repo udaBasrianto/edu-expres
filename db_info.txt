@@ -1,0 +1,30 @@
+Quizzes table structure:
+┌─────────┬───────────────────────────┬───────────────────┬───────┬───────┬─────────┬──────────────────┐
+│ (index) │ Field                     │ Type              │ Null  │ Key   │ Default │ Extra            │
+├─────────┼───────────────────────────┼───────────────────┼───────┼───────┼─────────┼──────────────────┤
+│ 0       │ 'id'                      │ 'bigint unsigned' │ 'NO'  │ 'PRI' │ null    │ 'auto_increment' │
+│ 1       │ 'title'                   │ 'varchar(255)'    │ 'NO'  │ ''    │ null    │ ''               │
+│ 2       │ 'description'             │ 'text'            │ 'YES' │ ''    │ null    │ ''               │
+│ 3       │ 'duration_minutes'        │ 'int'             │ 'YES' │ ''    │ '0'     │ ''               │
+│ 4       │ 'is_active'               │ 'tinyint(1)'      │ 'YES' │ ''    │ '1'     │ ''               │
+│ 5       │ 'created_at'              │ 'datetime'        │ 'NO'  │ ''    │ null    │ ''               │
+│ 6       │ 'updated_at'              │ 'datetime'        │ 'NO'  │ ''    │ null    │ ''               │
+│ 7       │ 'certificate_template_id' │ 'bigint unsigned' │ 'YES' │ 'MUL' │ null    │ ''               │
+│ 8       │ 'certificate_threshold'   │ 'int'             │ 'YES' │ ''    │ null    │ ''               │
+└─────────┴───────────────────────────┴───────────────────┴───────┴───────┴─────────┴──────────────────┘
+Materials table structure:
+┌─────────┬─────────────────┬───────────────────┬───────┬───────┬─────────┬──────────────────┐
+│ (index) │ Field           │ Type              │ Null  │ Key   │ Default │ Extra            │
+├─────────┼─────────────────┼───────────────────┼───────┼───────┼─────────┼──────────────────┤
+│ 0       │ 'id'            │ 'bigint unsigned' │ 'NO'  │ 'PRI' │ null    │ 'auto_increment' │
+│ 1       │ 'course_id'     │ 'bigint unsigned' │ 'NO'  │ 'MUL' │ null    │ ''               │
+│ 2       │ 'title'         │ 'varchar(191)'    │ 'NO'  │ ''    │ null    │ ''               │
+│ 3       │ 'duration'      │ 'varchar(191)'    │ 'YES' │ ''    │ null    │ ''               │
+│ 4       │ 'type'          │ 'varchar(191)'    │ 'NO'  │ ''    │ 'video' │ ''               │
+│ 5       │ 'link'          │ 'varchar(191)'    │ 'YES' │ ''    │ null    │ ''               │
+│ 6       │ 'media_url'     │ 'varchar(191)'    │ 'YES' │ ''    │ null    │ ''               │
+│ 7       │ 'timer_seconds' │ 'int'             │ 'NO'  │ ''    │ '0'     │ ''               │
+│ 8       │ 'order'         │ 'int'             │ 'NO'  │ ''    │ '0'     │ ''               │
+│ 9       │ 'created_at'    │ 'timestamp'       │ 'YES' │ ''    │ null    │ ''               │
+│ 10      │ 'updated_at'    │ 'timestamp'       │ 'YES' │ ''    │ null    │ ''               │
+└─────────┴─────────────────┴───────────────────┴───────┴───────┴─────────┴──────────────────┘

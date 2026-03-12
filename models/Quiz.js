@@ -3,7 +3,7 @@ const sequelize = require('../config/database');
 
 const Quiz = sequelize.define('Quiz', {
     id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         primaryKey: true,
         autoIncrement: true
     },
@@ -24,7 +24,7 @@ const Quiz = sequelize.define('Quiz', {
         defaultValue: true
     },
     certificate_template_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         allowNull: true
     },
     certificate_threshold: {

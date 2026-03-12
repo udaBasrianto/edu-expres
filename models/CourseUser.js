@@ -5,12 +5,12 @@ const Course = require('./Course');
 
 const CourseUser = sequelize.define('CourseUser', {
     id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         primaryKey: true,
         autoIncrement: true
     },
     user_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         allowNull: false,
         references: {
             model: User,
@@ -18,7 +18,7 @@ const CourseUser = sequelize.define('CourseUser', {
         }
     },
     course_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         allowNull: false,
         references: {
             model: Course,

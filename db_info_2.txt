@@ -1,0 +1,28 @@
+Categories table structure:
+┌─────────┬──────────────┬───────────────────┬───────┬───────┬───────────┬──────────────────┐
+│ (index) │ Field        │ Type              │ Null  │ Key   │ Default   │ Extra            │
+├─────────┼──────────────┼───────────────────┼───────┼───────┼───────────┼──────────────────┤
+│ 0       │ 'id'         │ 'bigint unsigned' │ 'NO'  │ 'PRI' │ null      │ 'auto_increment' │
+│ 1       │ 'name'       │ 'varchar(255)'    │ 'NO'  │ ''    │ null      │ ''               │
+│ 2       │ 'slug'       │ 'varchar(255)'    │ 'YES' │ 'UNI' │ null      │ ''               │
+│ 3       │ 'color'      │ 'varchar(255)'    │ 'YES' │ ''    │ '#3B82F6' │ ''               │
+│ 4       │ 'created_at' │ 'datetime'        │ 'NO'  │ ''    │ null      │ ''               │
+│ 5       │ 'updated_at' │ 'datetime'        │ 'NO'  │ ''    │ null      │ ''               │
+└─────────┴──────────────┴───────────────────┴───────┴───────┴───────────┴──────────────────┘
+Posts table structure:
+┌─────────┬──────────────────┬─────────────────────────────┬───────┬───────┬─────────────┬──────────────────┐
+│ (index) │ Field            │ Type                        │ Null  │ Key   │ Default     │ Extra            │
+├─────────┼──────────────────┼─────────────────────────────┼───────┼───────┼─────────────┼──────────────────┤
+│ 0       │ 'id'             │ 'bigint unsigned'           │ 'NO'  │ 'PRI' │ null        │ 'auto_increment' │
+│ 1       │ 'title'          │ 'varchar(255)'              │ 'NO'  │ ''    │ null        │ ''               │
+│ 2       │ 'slug'           │ 'varchar(255)'              │ 'YES' │ 'UNI' │ null        │ ''               │
+│ 3       │ 'type'           │ 'varchar(255)'              │ 'YES' │ ''    │ 'article'   │ ''               │
+│ 4       │ 'content'        │ 'text'                      │ 'YES' │ ''    │ null        │ ''               │
+│ 5       │ 'image'          │ 'varchar(255)'              │ 'YES' │ ''    │ null        │ ''               │
+│ 6       │ 'category_id'    │ 'int'                       │ 'YES' │ ''    │ null        │ ''               │
+│ 7       │ 'status'         │ "enum('draft','published')" │ 'NO'  │ ''    │ 'published' │ ''               │
+│ 8       │ 'show_in_slider' │ 'tinyint(1)'                │ 'NO'  │ ''    │ '0'         │ ''               │
+│ 9       │ 'order'          │ 'int'                       │ 'NO'  │ ''    │ '0'         │ ''               │
+│ 10      │ 'created_at'     │ 'timestamp'                 │ 'YES' │ ''    │ null        │ ''               │
+│ 11      │ 'updated_at'     │ 'timestamp'                 │ 'YES' │ ''    │ null        │ ''               │
+└─────────┴──────────────────┴─────────────────────────────┴───────┴───────┴─────────────┴──────────────────┘

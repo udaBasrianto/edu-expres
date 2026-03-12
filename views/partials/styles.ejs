@@ -21,8 +21,8 @@
 
         /* Dynamic Theme Color */
         :root {
-            --primary-color: <%= primaryColor %>;
-            --primary-hover: <%= primaryColor %>dd; /* slight transparency for hover */
+            --primary-color: <%= locals.primaryColor || '#1e3a8a' %>;
+            --primary-hover: <%= (locals.primaryColor || '#1e3a8a') %>dd; /* slight transparency for hover */
             --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
         }
 

@@ -10,28 +10,7 @@ const { Op, fn, col, literal } = require('sequelize');
 
 exports.index = async (req, res) => {
 
-    let appSettings = {
-        app_name: 'Edu HSI (Express)',
-        logo_path: null,
-        theme_color: 'blue'
-    };
-
-    try {
-        const dbSettings = await AppSetting.findOne({ where: { key: 'default' } });
-        if (dbSettings) {
-            appSettings = dbSettings;
-        }
-    } catch (err) {
-        console.error('Error fetching app settings:', err);
-    }
-
-    const colorMap = {
-        'blue': '#1e3a8a', 'green': '#065f46', 'red': '#991b1b', 'purple': '#5b21b6',
-        'pink': '#9d174d', 'orange': '#9a3412', 'teal': '#0f766e', 'emerald': '#065f46',
-        'cyan': '#155e75', 'indigo': '#3730a3', 'violet': '#5b21b6', 'fuchsia': '#86198f',
-        'rose': '#9f1239', 'black': '#111827', 'slate': '#1e293b'
-    };
-    const primaryColor = colorMap[appSettings.theme_color] || appSettings.theme_color || '#1e3a8a';
+    // appSettings and primaryColor are now handled by global middleware in server.js
 
     let quizzesJson = [];
     const myAttempts = [];
@@ -191,8 +170,6 @@ exports.index = async (req, res) => {
     }
 
     res.render('layout', {
-        appSettings,
-        primaryColor,
         quizzesJson,
         myAttempts,
         myCourses,

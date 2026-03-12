@@ -3,7 +3,7 @@ const sequelize = require('../config/database');
 
 const Post = sequelize.define('Post', {
     id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         primaryKey: true,
         autoIncrement: true
     },
@@ -12,7 +12,7 @@ const Post = sequelize.define('Post', {
     type: { type: DataTypes.STRING, defaultValue: 'article' },
     content: { type: DataTypes.TEXT },
     image: { type: DataTypes.STRING },
-    category_id: { type: DataTypes.BIGINT },
+    category_id: { type: DataTypes.BIGINT.UNSIGNED },
     status: { type: DataTypes.STRING, defaultValue: 'draft' },
     order: { type: DataTypes.INTEGER, defaultValue: 0 },
 }, {

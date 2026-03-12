@@ -4,12 +4,12 @@ const QuizQuestion = require('./QuizQuestion');
 
 const QuizOption = sequelize.define('QuizOption', {
     id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         primaryKey: true,
         autoIncrement: true
     },
     quiz_question_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         allowNull: false,
         references: {
             model: QuizQuestion,

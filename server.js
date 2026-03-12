@@ -34,7 +34,33 @@ app.set('views', path.join(__dirname, 'views'));
 // Load all models and associations
 const models = require('./models');
 
-// Routes
+// Middleware to provide appSettings and primaryColor globally
+app.use((req, res, next) => {
+    models.AppSetting.findOne({ where: { key: 'default' } })
+        .then(settings => {
+            let s = settings;
+            if (!s) {
+                s = { app_name: 'Edu HSI (Express)', logo_path: null, theme_color: 'blue' };
+            }
+            res.locals.appSettings = s;
+            
+            const colorMap = {
+                'blue': '#1e3a8a', 'green': '#065f46', 'red': '#991b1b', 'purple': '#5b21b6',
+                'pink': '#9d174d', 'orange': '#9a3412', 'teal': '#0f766e', 'emerald': '#065f46',
+                'cyan': '#155e75', 'indigo': '#3730a3', 'violet': '#5b21b6', 'fuchsia': '#86198f',
+                'rose': '#9f1239', 'black': '#111827', 'slate': '#1e293b'
+            };
+            res.locals.primaryColor = colorMap[s.theme_color] || s.theme_color || '#1e3a8a';
+            next();
+        })
+        .catch(err => {
+            console.error('Global Middleware Error:', err);
+            res.locals.appSettings = { app_name: 'Edu HSI (Express)', theme_color: 'blue' };
+            res.locals.primaryColor = '#1e3a8a';
+            next();
+        });
+});
+
 const mainRoutes = require('./routes/index');
 app.use('/', mainRoutes);
 

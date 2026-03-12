@@ -3,7 +3,7 @@ const sequelize = require('../config/database');
 
 const CertificateTemplate = sequelize.define('CertificateTemplate', {
     id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         primaryKey: true,
         autoIncrement: true
     },

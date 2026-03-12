@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>
-        <%= appSettings.app_name || 'Edu HSI' %>
+        <%= locals.appSettings ? locals.appSettings.app_name : 'Edu HSI' %>
     </title>
     <!-- PWA -->
-    <meta name="theme-color" content="<%= primaryColor %>">
+    <meta name="theme-color" content="<%= locals.primaryColor || '#1e3a8a' %>">
     <link rel="manifest" href="/manifest.json">
     <script>
         if ('serviceWorker' in navigator) {

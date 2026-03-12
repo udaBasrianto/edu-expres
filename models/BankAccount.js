@@ -3,7 +3,7 @@ const sequelize = require('../config/database');
 
 const BankAccount = sequelize.define('BankAccount', {
     id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         primaryKey: true,
         autoIncrement: true
     },

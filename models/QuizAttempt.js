@@ -5,12 +5,12 @@ const Quiz = require('./Quiz');
 
 const QuizAttempt = sequelize.define('QuizAttempt', {
     id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         primaryKey: true,
         autoIncrement: true
     },
     user_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         allowNull: false,
         references: {
             model: User,
@@ -18,7 +18,7 @@ const QuizAttempt = sequelize.define('QuizAttempt', {
         }
     },
     quiz_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         allowNull: false,
         references: {
             model: Quiz,

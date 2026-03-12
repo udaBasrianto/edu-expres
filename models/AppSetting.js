@@ -3,7 +3,7 @@ const sequelize = require('../config/database');
 
 const AppSetting = sequelize.define('AppSetting', {
     id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.BIGINT.UNSIGNED,
         primaryKey: true,
         autoIncrement: true
     },
