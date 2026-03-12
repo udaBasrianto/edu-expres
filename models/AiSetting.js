@@ -2,6 +2,11 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const AiSetting = sequelize.define('AiSetting', {
+    id: {
+        type: DataTypes.BIGINT,
+        primaryKey: true,
+        autoIncrement: true
+    },
     provider: { type: DataTypes.STRING, allowNull: false },
     api_key: { type: DataTypes.TEXT },
     models: { type: DataTypes.JSON },

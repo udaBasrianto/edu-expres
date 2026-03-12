@@ -2,6 +2,11 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const AppSetting = sequelize.define('AppSetting', {
+    id: {
+        type: DataTypes.BIGINT,
+        primaryKey: true,
+        autoIncrement: true
+    },
     key: { type: DataTypes.STRING, defaultValue: 'default' },
     app_name: { type: DataTypes.STRING, defaultValue: 'HSI Edu' },
     app_slogan: { type: DataTypes.STRING },

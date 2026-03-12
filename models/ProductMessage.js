@@ -2,8 +2,13 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const ProductMessage = sequelize.define('ProductMessage', {
-    user_id: { type: DataTypes.INTEGER, allowNull: false },
-    product_id: { type: DataTypes.INTEGER, allowNull: false },
+    id: {
+        type: DataTypes.BIGINT,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    user_id: { type: DataTypes.BIGINT, allowNull: false },
+    product_id: { type: DataTypes.BIGINT, allowNull: false },
     message: { type: DataTypes.TEXT, allowNull: false },
     is_read: { type: DataTypes.BOOLEAN, defaultValue: false },
 }, {

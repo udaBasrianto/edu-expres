@@ -2,9 +2,10 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const CartItem = sequelize.define('CartItem', {
-    user_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
-    product_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
-    course_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
+    id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
+    user_id: { type: DataTypes.BIGINT, allowNull: false },
+    product_id: { type: DataTypes.BIGINT, allowNull: true },
+    course_id: { type: DataTypes.BIGINT, allowNull: true },
     quantity: { type: DataTypes.INTEGER, defaultValue: 1 },
     note: { type: DataTypes.TEXT },
 }, {
