@@ -211,14 +211,10 @@
                             class="w-full bg-white border border-slate-100 rounded-2xl py-4 px-5 text-sm font-black text-slate-800 focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all shadow-sm" required>
                     </div>
                     
-                    <div class="space-y-1.5 opacity-60">
+                    <div class="space-y-1.5">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Alamat Email</label>
-                        <div class="w-full bg-slate-100 border border-slate-200 rounded-2xl py-4 px-5 text-sm font-black text-slate-500 flex items-center justify-between">
-                            <%= user.email %>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-slate-400">
-                                <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
+                        <input type="email" name="email" value="<%= user.email %>" 
+                            class="w-full bg-white border border-slate-100 rounded-2xl py-4 px-5 text-sm font-black text-slate-800 focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all shadow-sm" required>
                     </div>
                     
                     <div class="pt-4 space-y-5">
@@ -338,8 +334,10 @@ async function handleUpdateProfile(e) {
 
         if (result.success) {
             notify(result.message, 'success');
-            // Update display name
+            // Update display name and email
             document.getElementById('profile-name-display').innerText = data.name;
+            const emailDisplay = document.querySelector('.bg-white p.text-xs.text-slate-400');
+            if (emailDisplay) emailDisplay.innerText = data.email;
             // Clear password fields
             form.querySelector('input[name="current_password"]').value = '';
             form.querySelector('input[name="new_password"]').value = '';

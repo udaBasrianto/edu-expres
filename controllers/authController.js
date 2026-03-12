@@ -128,13 +128,15 @@ exports.updateProfile = async (req, res) => {
         }
 
         user.name = name;
-        // user.email = email; // Optional: allow email change? better not for now or require verification
+        if (email) {
+            user.email = email;
+        }
 
         await user.save();
 
         // Update session
         req.session.user.name = user.name;
-        // req.session.user.email = user.email;
+        req.session.user.email = user.email;
 
         res.json({ success: true, message: 'Profil berhasil diperbarui', user: req.session.user });
 
