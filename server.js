@@ -79,8 +79,8 @@ async function ensureAppSettings() {
 // Use sequelize from config to sync database
 const sequelize = require('./config/database');
 
-sequelize.sync({ alter: true }).then(() => {
-    console.log('Database synchronized and tables created.');
+sequelize.sync({ force: true }).then(() => {
+    console.log('Database synchronized and tables RECREATED from scratch.');
     ensureAdmin();
     ensureAppSettings();
     
