@@ -85,9 +85,14 @@ exports.scrape = async (req, res) => {
                 console.log('HTML Loaded, status:', response.status);
                 const $ = cheerio.load(response.data);
                 
-                const articleSelectors = ['article', '.post', '.type-post', '.blog-post', '.entry', '.item', '.hentry', '.card'];
-                let articles = null;
+                const articleSelectors = [
+                    'article', 
+                    '.post', '.type-post', '.blog-post', 
+                    '.entry', '.item', '.hentry', '.card',
+                    '.post-item', '.tie-standard' // Jannah theme specifics
+                ];
                 
+                let articles = null;
                 for (const selector of articleSelectors) {
                     if ($(selector).length >= 1) {
                         articles = $(selector);
@@ -98,24 +103,42 @@ exports.scrape = async (req, res) => {
                 
                 if (!articles || articles.length === 0) {
                     console.log('Using generic div selectors...');
-                    articles = $('div[class*="post"], div[class*="article"], section[class*="post"]').slice(0, 10);
+                    articles = $('div[class*="post"], div[class*="article"], section[class*="post"], div[class*="item"]').slice(0, 10);
                 }
 
                 if (articles && articles.length > 0) {
                     articles.each((i, el) => {
                         if (i >= 8) return;
-                        const titleEl = $(el).find('h1, h2, h3, h4, .entry-title, .post-title, a[href*="/20"], .title a').first();
+                        // Broaden title search
+                        const titleEl = $(el).find('h1, h2, h3, h4, .entry-title, .post-title, .title a, a.post-title, a[href*="/20"]').first();
                         const title = titleEl.text().trim();
                         let link = titleEl.attr('href') || $(el).find('a').attr('href');
                         
                         if (link && !link.startsWith('http')) link = new URL(link, baseUrl).href;
 
-                        let content = $(el).find('.entry-content, .post-content, .article-content, .content, p').first().html();
-                        let imageUrl = $(el).find('img').attr('src');
+                        // Broaden content/excerpt search
+                        let content = $(el).find('.entry-content, .post-content, .article-content, .content, .post-excerpt, .excerpt, p').first().html();
                         
-                        if (!imageUrl || imageUrl.includes('base64') || imageUrl.length < 10) {
-                            imageUrl = $(el).find('img').attr('data-src') || $(el).find('img').attr('data-lazy-src') || $(el).find('img').attr('data-original');
+                        // Robust Image extraction
+                        let imageUrl = null;
+                        const img = $(el).find('img').first();
+                        if (img.length > 0) {
+                            imageUrl = img.attr('data-src') || 
+                                      img.attr('data-lazy-src') || 
+                                      img.attr('data-original') || 
+                                      img.attr('srcset')?.split(' ')[0] ||
+                                      img.attr('src');
                         }
+                        
+                        // Fallback for background images
+                        if (!imageUrl) {
+                            const style = $(el).find('[style*="background-image"]').first().attr('style');
+                            if (style) {
+                                const match = style.match(/url\(['"]?([^'"]+)['"]?\)/);
+                                if (match) imageUrl = match[1];
+                            }
+                        }
+
                         if (imageUrl && !imageUrl.startsWith('http')) {
                             try { imageUrl = new URL(imageUrl, baseUrl).href; } catch(e) {}
                         }
@@ -133,7 +156,7 @@ exports.scrape = async (req, res) => {
 
         if (scrapedPosts.length === 0) {
             console.warn('Scraping result empty for:', url);
-            return res.redirect('/admin/posts?error=Gagal menemukan artikel. Website mungkin memiliki proteksi bot atau struktur yang berbeda.');
+            return res.redirect('/admin/posts?error=Gagal menemukan artikel. Website ini mungkin memiliki struktur khusus atau proteksi akses dari server VPS.');
         }
 
         // 3. Process and Save
@@ -161,11 +184,11 @@ exports.scrape = async (req, res) => {
                 await Post.create({
                     title: item.title,
                     slug,
-                    content: item.content || 'Konten hasil scraping',
+                    content: item.content || 'No content provided',
                     type: 'article',
                     status: 'published',
                     image: localImage,
-                    category_id: null
+                    category_id: null // Admin can categorize later
                 });
                 newCount++;
             }
