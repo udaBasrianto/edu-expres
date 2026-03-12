@@ -76,9 +76,18 @@ async function ensureAppSettings() {
     }
 }
 
-ensureAdmin();
-ensureAppSettings();
+// Use sequelize from config to sync database
+const sequelize = require('./config/database');
 
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+sequelize.sync({ alter: true }).then(() => {
+    console.log('Database synchronized and tables created.');
+    ensureAdmin();
+    ensureAppSettings();
+    
+    app.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+    });
+}).catch(err => {
+    console.error('Database sync error:', err);
 });
+
