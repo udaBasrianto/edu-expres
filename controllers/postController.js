@@ -49,6 +49,7 @@ exports.scrape = async (req, res) => {
             console.log('Attempting WP API Scraping:', apiTarget);
             const apiRes = await axios.get(apiTarget, { 
                 timeout: 10000,
+                httpsAgent: new https.Agent({ rejectUnauthorized: false }),
                 headers: { 
                     'Accept': 'application/json',
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
@@ -73,6 +74,7 @@ exports.scrape = async (req, res) => {
             console.log('Falling back to HTML scraping for:', url);
             try {
                 const response = await axios.get(url, {
+                    httpsAgent: new https.Agent({ rejectUnauthorized: false }),
                     headers: {
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
                         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8'
