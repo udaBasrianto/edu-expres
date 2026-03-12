@@ -138,17 +138,19 @@ exports.index = async (req, res) => {
         console.error('Error fetching leaderboard:', error);
     }
     try {
-        const paid = await Course.findAll({
-            where: { type: 'paid' },
-            limit: 6,
-            order: [['createdAt', 'DESC']]
+        const Product = require('../models/Product');
+        const dbProducts = await Product.findAll({
+            where: { is_active: true },
+            limit: 10,
+            order: [['created_at', 'DESC']]
         });
-        products = paid.map(c => ({
-            id: c.id,
-            title: c.title,
-            short_desc: c.short_desc,
-            price: c.price,
-            currency: c.currency
+        products = dbProducts.map(p => ({
+            id: p.id,
+            title: p.name,
+            short_desc: p.description ? p.description.substring(0, 50) + '...' : '',
+            price: p.price,
+            image: p.image,
+            link: p.link
         }));
     } catch (error) {
         console.error('Error fetching products:', error);

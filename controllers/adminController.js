@@ -404,7 +404,7 @@ exports.createPost = async (req, res) => {
         await Post.create({
             title, slug, content, type: type || 'article',
             category_id: category_id || null,
-            status: status || 'draft',
+            status: status || 'published', // Default to published
             order: sortOrder || 0,
             image: req.file ? req.file.filename : null,
         });

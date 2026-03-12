@@ -131,9 +131,9 @@ exports.scrape = async (req, res) => {
                             slug,
                             content: content || 'Konten hasil scraping',
                             type: 'article',
-                            status: 'draft', // Default to draft for review
+                            status: 'published', // Changed from draft for immediate visibility
                             image: localImage,
-                            category_id: null // Or set a default scraped category
+                            category_id: null
                         });
                         return true;
                     }

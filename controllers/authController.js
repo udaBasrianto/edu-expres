@@ -11,9 +11,10 @@ exports.loginPage = (req, res) => {
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
+    const cleanEmail = email ? email.trim().toLowerCase() : '';
 
     try {
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email: cleanEmail } });
 
         if (!user) {
             return res.status(401).json({ success: false, message: 'Email tidak ditemukan' });
@@ -23,6 +24,10 @@ exports.login = async (req, res) => {
 
         if (!isMatch) {
             return res.status(401).json({ success: false, message: 'Password salah' });
+        }
+
+        if (user.is_active === false) {
+            return res.status(403).json({ success: false, message: 'Akun Anda dinonaktifkan. Silakan hubungi admin.' });
         }
 
         req.session.user = {
@@ -62,6 +67,8 @@ exports.registerPage = (req, res) => {
 exports.register = async (req, res) => {
     try {
         const { name, email, password, confirm_password } = req.body;
+        const cleanEmail = email ? email.trim().toLowerCase() : '';
+
         if (!name || !email || !password || !confirm_password) {
             return res.status(400).json({ success: false, message: 'Semua field wajib diisi' });
         }
@@ -71,16 +78,17 @@ exports.register = async (req, res) => {
         if (password !== confirm_password) {
             return res.status(400).json({ success: false, message: 'Konfirmasi password tidak cocok' });
         }
-        const existing = await User.findOne({ where: { email } });
+        const existing = await User.findOne({ where: { email: cleanEmail } });
         if (existing) {
             return res.status(409).json({ success: false, message: 'Email sudah terdaftar' });
         }
         const hashed = await bcrypt.hash(password, 10);
         const user = await User.create({
             name,
-            email,
+            email: cleanEmail,
             password: hashed,
-            role: 'student'
+            role: 'student',
+            is_active: true
         });
         req.session.user = {
             id: user.id,
@@ -129,7 +137,7 @@ exports.updateProfile = async (req, res) => {
 
         user.name = name;
         if (email) {
-            user.email = email;
+            user.email = email.trim().toLowerCase();
         }
 
         await user.save();
