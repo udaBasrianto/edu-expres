@@ -46,13 +46,17 @@ exports.scrape = async (req, res) => {
         // 1. Try WordPress REST API First
         try {
             const apiTarget = `${baseUrl}/wp-json/wp/v2/posts?_embed&per_page=5`;
-            console.log('Trying WP REST API:', apiTarget);
+            console.log('Attempting WP API Scraping:', apiTarget);
             const apiRes = await axios.get(apiTarget, { 
-                timeout: 8000,
-                headers: { 'Accept': 'application/json' }
+                timeout: 10000,
+                headers: { 
+                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+                }
             });
             
-            if (Array.isArray(apiRes.data)) {
+            if (apiRes.data && Array.isArray(apiRes.data)) {
+                console.log(`Found ${apiRes.data.length} posts via API`);
                 scrapedPosts = apiRes.data.map(post => ({
                     title: post.title?.rendered || 'Untitled',
                     content: post.content?.rendered || '',
@@ -61,58 +65,73 @@ exports.scrape = async (req, res) => {
                 }));
             }
         } catch (apiErr) {
-            console.log('WP REST API failed:', apiErr.message);
+            console.log('WP REST API failed:', apiErr.message, apiErr.response ? `Status: ${apiErr.response.status}` : '');
         }
 
         // 2. Fallback to HTML Scraping
         if (scrapedPosts.length === 0) {
             console.log('Falling back to HTML scraping for:', url);
-            const response = await axios.get(url, {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
-                },
-                timeout: 10000
-            });
-            const $ = cheerio.load(response.data);
-            
-            const articleSelectors = ['article', '.post', '.type-post', '.blog-post', '.entry', '.item', '.hentry'];
-            let articles = null;
-            
-            for (const selector of articleSelectors) {
-                if ($(selector).length > 2) {
-                    articles = $(selector);
-                    break;
-                }
-            }
-            
-            if (!articles || articles.length === 0) {
-                articles = $('div[class*="post"], div[class*="article"], section[class*="post"]').slice(0, 5);
-            }
-
-            articles.each((i, el) => {
-                if (i >= 5) return;
-                const titleEl = $(el).find('h1, h2, h3, .entry-title, .post-title, a[href*="/20"]').first();
-                const title = titleEl.text().trim();
-                let link = titleEl.attr('href') || $(el).find('a').attr('href');
+            try {
+                const response = await axios.get(url, {
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8'
+                    },
+                    timeout: 12000
+                });
                 
-                if (link && !link.startsWith('http')) link = new URL(link, baseUrl).href;
-
-                let content = $(el).find('.entry-content, .post-content, .article-content, .content, p').first().html();
-                let imageUrl = $(el).find('img').attr('src');
+                console.log('HTML Loaded, status:', response.status);
+                const $ = cheerio.load(response.data);
                 
-                if (!imageUrl || imageUrl.includes('base64')) {
-                    imageUrl = $(el).find('img').attr('data-src') || $(el).find('img').attr('data-lazy-src') || $(el).find('img').attr('data-original');
+                const articleSelectors = ['article', '.post', '.type-post', '.blog-post', '.entry', '.item', '.hentry', '.card'];
+                let articles = null;
+                
+                for (const selector of articleSelectors) {
+                    if ($(selector).length >= 1) {
+                        articles = $(selector);
+                        console.log(`Matched selector: ${selector} (${articles.length} items)`);
+                        break;
+                    }
                 }
-                if (imageUrl && !imageUrl.startsWith('http')) imageUrl = new URL(imageUrl, baseUrl).href;
+                
+                if (!articles || articles.length === 0) {
+                    console.log('Using generic div selectors...');
+                    articles = $('div[class*="post"], div[class*="article"], section[class*="post"]').slice(0, 10);
+                }
 
-                if (title && link) {
-                    scrapedPosts.push({ title, content, imageUrl, link });
+                if (articles && articles.length > 0) {
+                    articles.each((i, el) => {
+                        if (i >= 8) return;
+                        const titleEl = $(el).find('h1, h2, h3, h4, .entry-title, .post-title, a[href*="/20"], .title a').first();
+                        const title = titleEl.text().trim();
+                        let link = titleEl.attr('href') || $(el).find('a').attr('href');
+                        
+                        if (link && !link.startsWith('http')) link = new URL(link, baseUrl).href;
+
+                        let content = $(el).find('.entry-content, .post-content, .article-content, .content, p').first().html();
+                        let imageUrl = $(el).find('img').attr('src');
+                        
+                        if (!imageUrl || imageUrl.includes('base64') || imageUrl.length < 10) {
+                            imageUrl = $(el).find('img').attr('data-src') || $(el).find('img').attr('data-lazy-src') || $(el).find('img').attr('data-original');
+                        }
+                        if (imageUrl && !imageUrl.startsWith('http')) {
+                            try { imageUrl = new URL(imageUrl, baseUrl).href; } catch(e) {}
+                        }
+
+                        if (title && title.length > 3 && link) {
+                            scrapedPosts.push({ title, content, imageUrl, link });
+                        }
+                    });
                 }
-            });
+                console.log(`Total posts found via HTML: ${scrapedPosts.length}`);
+            } catch (htmlErr) {
+                console.error('HTML Fetch Error:', htmlErr.message);
+            }
         }
 
         if (scrapedPosts.length === 0) {
-            return res.redirect('/admin/posts?error=Tidak dapat menemukan artikel di URL tersebut. Pastikan URL benar atau situs mengizinkan scraping.');
+            console.warn('Scraping result empty for:', url);
+            return res.redirect('/admin/posts?error=Gagal menemukan artikel. Website mungkin memiliki proteksi bot atau struktur yang berbeda.');
         }
 
         // 3. Process and Save
