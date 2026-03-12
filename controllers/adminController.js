@@ -736,8 +736,15 @@ exports.appSettingsPage = async (req, res) => {
 
 exports.updateAppSettings = async (req, res) => {
     try {
-        const { app_name, app_slogan, theme_color, font_family, blog_title, academy_slogan, academy_title, login_header_text } = req.body;
+        const { 
+            app_name, app_slogan, theme_color, font_family, 
+            blog_title, academy_slogan, academy_title, 
+            login_header_text, whatsapp, contact_email, 
+            instagram, website 
+        } = req.body;
+
         let [settings] = await AppSetting.findOrCreate({ where: { key: 'default' } });
+        
         settings.app_name = app_name || settings.app_name;
         settings.app_slogan = app_slogan;
         settings.theme_color = theme_color || 'blue';
@@ -746,12 +753,23 @@ exports.updateAppSettings = async (req, res) => {
         settings.academy_slogan = academy_slogan;
         settings.academy_title = academy_title;
         settings.login_header_text = login_header_text;
-        if (req.file) settings.logo_path = req.file.filename;
+        
+        // Add new fields (will be dynamically added to JSON or handled via model if updated)
+        settings.whatsapp = whatsapp;
+        settings.contact_email = contact_email;
+        settings.instagram = instagram;
+        settings.website = website;
+
+        if (req.file) {
+            settings.logo_path = req.file.filename;
+            console.log('New logo uploaded:', req.file.filename);
+        }
+
         await settings.save();
-        res.redirect('/admin/app-settings');
+        res.redirect('/admin/app-settings?success=true');
     } catch (e) {
         console.error('Update app settings error:', e);
-        res.redirect('/admin/app-settings');
+        res.redirect('/admin/app-settings?error=true');
     }
 };
 

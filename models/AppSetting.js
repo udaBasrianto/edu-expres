@@ -28,6 +28,10 @@ const AppSetting = sequelize.define('AppSetting', {
     google_client_id: { type: DataTypes.STRING },
     google_client_secret: { type: DataTypes.STRING },
     login_header_text: { type: DataTypes.STRING },
+    whatsapp: { type: DataTypes.STRING },
+    contact_email: { type: DataTypes.STRING },
+    instagram: { type: DataTypes.STRING },
+    website: { type: DataTypes.STRING },
 }, {
     tableName: 'app_settings',
     timestamps: true,
