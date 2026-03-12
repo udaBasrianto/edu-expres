@@ -1,4 +1,6 @@
 const Course = require('../models/Course');
+const AppSetting = require('../models/AppSetting');
+
 const CourseUser = require('../models/CourseUser');
 const Quiz = require('../models/Quiz');
 const QuizAttempt = require('../models/QuizAttempt');
@@ -7,11 +9,21 @@ const Post = require('../models/Post');
 const { Op, fn, col, literal } = require('sequelize');
 
 exports.index = async (req, res) => {
-    const appSettings = {
+
+    let appSettings = {
         app_name: 'Edu HSI (Express)',
         logo_path: null,
         theme_color: 'blue'
     };
+
+    try {
+        const dbSettings = await AppSetting.findOne({ where: { key: 'default' } });
+        if (dbSettings) {
+            appSettings = dbSettings;
+        }
+    } catch (err) {
+        console.error('Error fetching app settings:', err);
+    }
 
     let quizzesJson = [];
     const myAttempts = [];

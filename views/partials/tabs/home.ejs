@@ -3,8 +3,8 @@
     <div class="sticky top-0 bg-white/90 backdrop-blur-xl z-30 px-5 pt-4 pb-3 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] border-b border-slate-100 md:hidden">
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-100 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name=<%= user ? user.name : 'Tamu' %>&background=1e3a8a&color=fff" class="w-full h-full object-cover" alt="Avatar">
+                <div class="w-10 h-10 rounded-full bg-primary/10 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
+                    <img src="https://ui-avatars.com/api/?name=<%= user ? user.name : 'Tamu' %>&background=<%= primaryColor.replace('#', '') %>&color=fff" class="w-full h-full object-cover" alt="Avatar">
                 </div>
                 <div>
                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none mb-1">Assalamualaikum,</p>
@@ -12,12 +12,12 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <div class="bg-blue-50/50 px-3 py-1.5 rounded-full border border-blue-100/50 flex items-center gap-1.5 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5 text-blue-600">
+                <div class="bg-primary/5 px-3 py-1.5 rounded-full border border-primary/10 flex items-center gap-1.5 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5 text-primary">
                         <path d="M12 7.5a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" />
                         <path fill-rule="evenodd" d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v14.25c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 0 1 1.5 19.125V4.875ZM11.25 12a.75.75 0 1 1 1.5 0 .75.75 0 0 1-1.5 0ZM9.75 8.625a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm7.5 0a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm-7.5 5.25a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm7.5 0a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z" clip-rule="evenodd" />
                     </svg>
-                    <span class="text-[11px] font-black text-blue-900 tracking-tight">Rp <%= (user && user.balance) ? Number(user.balance).toLocaleString('id-ID') : '0' %></span>
+                    <span class="text-[11px] font-black text-primary tracking-tight">Rp <%= (user && user.balance) ? Number(user.balance).toLocaleString('id-ID') : '0' %></span>
                 </div>
                 <button class="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 active:scale-90 transition-transform relative">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
@@ -31,18 +31,18 @@
         <!-- Native Search UI -->
         <div class="relative group">
             <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                 </svg>
             </div>
             <input type="text" placeholder="Cari materi, kuis, atau artikel..." 
-                class="w-full bg-slate-50 border-none rounded-2xl py-3.5 pl-11 pr-4 text-xs font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-blue-600/10 focus:bg-white transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                class="w-full bg-slate-50 border-none rounded-2xl py-3.5 pl-11 pr-4 text-xs font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-primary/10 focus:bg-white transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
         </div>
     </div>
 
     <!-- Banner Slider (Edge to Edge Style) -->
     <section class="mt-4 px-5">
-        <div id="home-slider" class="w-full h-64 md:h-[450px] rounded-[32px] overflow-hidden relative bg-slate-200 group shadow-xl shadow-blue-900/10">
+        <div id="home-slider" class="w-full h-64 md:h-[450px] rounded-[32px] overflow-hidden relative bg-slate-200 group shadow-xl shadow-primary/10">
             <% if (typeof blogPosts !== 'undefined' && blogPosts.length > 0) { %>
                 <% blogPosts.slice(0, 5).forEach((post, index) => { %>
                     <div class="slider-item absolute inset-0 transition-all duration-1000 transform <%= index === 0 ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full' %> z-10 overflow-hidden" data-index="<%= index %>">
@@ -54,7 +54,7 @@
                         <div class="absolute bottom-0 left-0 right-0 p-6 md:p-10 z-20">
                             <div class="flex items-center gap-2 mb-2">
                                 <% if (post.category) { %>
-                                <span class="text-[9px] md:text-xs font-black text-white bg-blue-600 px-2.5 py-1 md:px-4 md:py-1.5 rounded-lg uppercase tracking-widest shadow-lg shadow-blue-600/30">
+                                <span class="text-[9px] md:text-xs font-black text-white bg-primary px-2.5 py-1 md:px-4 md:py-1.5 rounded-lg uppercase tracking-widest shadow-lg shadow-primary/30">
                                     <%= post.category.name %>
                                 </span>
                                 <% } %>
@@ -96,7 +96,7 @@
     <section class="px-5 py-6">
         <div class="grid grid-cols-4 gap-4">
             <button onclick="switchTab('academy')" class="flex flex-col items-center gap-2 group">
-                <div class="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 group-active:scale-90 transition-transform shadow-sm">
+                <div class="w-14 h-14 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary group-active:scale-90 transition-transform shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                     </svg>
@@ -132,24 +132,24 @@
 
     <!-- Native Stats Card (Integrated) -->
     <section class="px-5 pb-6">
-        <div class="bg-blue-900 rounded-[24px] p-5 shadow-xl shadow-blue-900/20 relative overflow-hidden flex items-center justify-between">
+        <div class="bg-primary rounded-[24px] p-5 shadow-xl shadow-primary/20 relative overflow-hidden flex items-center justify-between">
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
             <div class="relative z-10">
-                <p class="text-[10px] font-black text-blue-300 uppercase tracking-widest mb-3">Statistik Belajar</p>
+                <p class="text-[10px] font-black opacity-60 text-white uppercase tracking-widest mb-3">Statistik Belajar</p>
                 <div class="flex items-center gap-6">
                     <div>
                         <p class="text-2xl font-black text-white leading-none"><%= typeof stats !== 'undefined' ? stats.courses : 0 %></p>
-                        <p class="text-[9px] font-bold text-blue-200 uppercase mt-1">Kursus</p>
+                        <p class="text-[9px] font-bold opacity-60 text-white uppercase mt-1">Kursus</p>
                     </div>
-                    <div class="w-[1px] h-8 bg-blue-800"></div>
+                    <div class="w-[1px] h-8 bg-white/20"></div>
                     <div>
                         <p class="text-2xl font-black text-white leading-none"><%= typeof stats !== 'undefined' ? stats.quizzes : 0 %></p>
-                        <p class="text-[9px] font-bold text-blue-200 uppercase mt-1">Kuis</p>
+                        <p class="text-[9px] font-bold opacity-60 text-white uppercase mt-1">Kuis</p>
                     </div>
                 </div>
             </div>
             <div class="relative z-10 bg-white/10 p-3 rounded-2xl border border-white/5 backdrop-blur-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-blue-300">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 opacity-60 text-white">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 1 3 2.48Z" />
                     </svg>
             </div>
@@ -224,7 +224,7 @@
     <section class="py-2">
         <div class="px-5 flex items-center justify-between mb-4">
             <h3 class="font-black text-slate-800 text-base tracking-tight">Rekomendasi Kursus</h3>
-            <button onclick="switchTab('academy')" class="text-[11px] font-black text-blue-600 uppercase tracking-widest">Lihat Semua</button>
+            <button onclick="switchTab('academy')" class="text-[11px] font-black text-primary uppercase tracking-widest">Lihat Semua</button>
         </div>
         <div id="home-reco-courses" class="flex overflow-x-auto gap-4 px-5 pb-6 no-scrollbar scroll-smooth">
             <!-- Populated via JS -->
@@ -235,13 +235,13 @@
     <section class="px-5 py-6 bg-white rounded-t-[32px] shadow-[0_-1px_10px_rgba(0,0,0,0.02)]">
         <div class="flex items-center justify-between mb-5">
             <h3 class="font-black text-slate-800 text-base tracking-tight">Kuis Terbaru</h3>
-            <button onclick="switchTab('quiz')" class="text-[11px] font-black text-blue-600 uppercase tracking-widest">Latihan</button>
+            <button onclick="switchTab('quiz')" class="text-[11px] font-black text-primary uppercase tracking-widest">Latihan</button>
         </div>
         <% if (quizzesJson && quizzesJson.length > 0) { %>
         <div class="space-y-4">
             <% quizzesJson.slice(0,3).forEach(function(quiz){ %>
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center gap-4 active:bg-slate-100 transition-colors">
-                <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
                     </svg>
@@ -250,7 +250,7 @@
                     <p class="font-black text-slate-800 text-sm truncate leading-none mb-1"><%= quiz.title %></p>
                     <p class="text-[11px] text-slate-400 truncate leading-none font-medium"><%= quiz.description || 'Uji kemampuan Anda hari ini' %></p>
                 </div>
-                <a href="/quiz/<%= quiz.id %>" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-blue-600 shadow-sm border border-slate-100">
+                <a href="/quiz/<%= quiz.id %>" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-primary shadow-sm border border-slate-100">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                     </svg>
@@ -285,7 +285,7 @@
                         </div>
                     </div>
                     <div class="flex flex-col items-end">
-                        <span class="text-[10px] font-black text-blue-600"><%= item.attempts %> Sesi</span>
+                        <span class="text-[10px] font-black text-primary"><%= item.attempts %> Sesi</span>
                     </div>
                 </div>
                 <% }) %>
@@ -313,8 +313,8 @@
                         <p class="text-[9px] text-slate-400 font-bold uppercase mb-2">E-Book & Video</p>
                     </div>
                     <div class="flex items-center justify-between mt-auto">
-                        <span class="text-[11px] font-black text-blue-900">Rp <%= Number(p.price).toLocaleString('id-ID') %></span>
-                        <button class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md active:scale-90 transition-transform" onclick="addProductToCart(<%= p.id %>, '<%- p.title %>', <%= p.price %>)">
+                        <span class="text-[11px] font-black text-primary">Rp <%= Number(p.price).toLocaleString('id-ID') %></span>
+                        <button class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shadow-md active:scale-90 transition-transform" onclick="addProductToCart(<%= p.id %>, '<%- p.title %>', <%= p.price %>)">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
@@ -337,17 +337,17 @@
             <div class="grid grid-cols-1 gap-4">
                 <% myCourses.forEach(course => { %>
                     <div class="bg-white p-4 rounded-[24px] shadow-sm border border-slate-100 flex gap-4 items-center">
-                        <div class="w-16 h-16 rounded-2xl bg-blue-900 flex items-center justify-center text-white text-xl font-black shrink-0 shadow-lg shadow-blue-900/10">
+                        <div class="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-white text-xl font-black shrink-0 shadow-lg shadow-primary/10">
                             <%= course.title.charAt(0) %>
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class="font-black text-slate-800 text-sm truncate mb-1 leading-none"><%= course.title %></h4>
                             <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-2">
-                                <div class="bg-blue-600 h-full w-[45%]" style="width: <%= Math.floor(Math.random() * 80) + 10 %>%"></div>
+                                <div class="bg-primary h-full w-[45%]" style="width: <%= Math.floor(Math.random() * 80) + 10 %>%"></div>
                             </div>
                             <div class="flex items-center justify-between mt-2">
                                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Progres: <%= Math.floor(Math.random() * 100) %>%</p>
-                                <a href="/classroom/<%= course.id %>" class="text-[9px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1">Lanjut <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-2 h-2"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg></a>
+                                <a href="/classroom/<%= course.id %>" class="text-[9px] font-black text-primary uppercase tracking-widest flex items-center gap-1">Lanjut <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-2 h-2"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg></a>
                             </div>
                         </div>
                     </div>
@@ -361,7 +361,7 @@
                     </svg>
                 </div>
                 <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4">Belum Ada Kursus Aktif</p>
-                <button onclick="switchTab('academy')" class="text-[11px] font-black bg-blue-600 text-white px-6 py-3 rounded-full uppercase tracking-widest shadow-lg shadow-blue-600/20 active:scale-95 transition-transform">Mulai Belajar</button>
+                <button onclick="switchTab('academy')" class="text-[11px] font-black bg-primary text-white px-6 py-3 rounded-full uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-transform">Mulai Belajar</button>
             </div>
         <% } %>
     </section>
@@ -388,8 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <h4 class="font-black text-slate-800 text-xs line-clamp-2 leading-tight mb-2 h-8">${course.title}</h4>
                 <div class="flex items-center justify-between mt-auto">
-                    <span class="text-[10px] font-black text-blue-900">${priceText}</span>
-                    <button class="w-7 h-7 rounded-full bg-slate-50 text-blue-600 flex items-center justify-center border border-slate-100 shadow-sm">
+                    <span class="text-[10px] font-black text-primary">${priceText}</span>
+                    <button class="w-7 h-7 rounded-full bg-slate-50 text-primary flex items-center justify-center border border-slate-100 shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
                     </button>
                 </div>

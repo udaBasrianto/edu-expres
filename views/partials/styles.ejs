@@ -19,10 +19,27 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
 
-        /* Mobile Safe Area */
+        /* Dynamic Theme Color */
+        <% 
+            const colorMap = {
+                'blue': '#1e3a8a', 'green': '#065f46', 'red': '#991b1b', 'purple': '#5b21b6',
+                'pink': '#9d174d', 'orange': '#9a3412', 'teal': '#0f766e', 'emerald': '#065f46',
+                'cyan': '#155e75', 'indigo': '#3730a3', 'violet': '#5b21b6', 'fuchsia': '#86198f',
+                'rose': '#9f1239', 'black': '#111827', 'slate': '#1e293b'
+            };
+            const primaryColor = colorMap[appSettings.theme_color] || appSettings.theme_color || '#1e3a8a';
+        %>
         :root {
+            --primary-color: <%= primaryColor %>;
+            --primary-hover: <%= primaryColor %>dd; /* slight transparency for hover */
             --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
         }
+
+        .bg-primary { background-color: var(--primary-color) !important; }
+        .text-primary { color: var(--primary-color) !important; }
+        .border-primary { border-color: var(--primary-color) !important; }
+        .hover-bg-primary:hover { background-color: var(--primary-hover) !important; }
+        .hover-text-primary:hover { color: var(--primary-hover) !important; }
         .safe-area-inset-bottom {
             padding-bottom: calc(12px + var(--safe-area-inset-bottom));
         }

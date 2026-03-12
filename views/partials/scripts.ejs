@@ -28,7 +28,7 @@
                 title: 'Informasi',
                 text: message,
                 icon: icon,
-                confirmButtonColor: '#1e3a8a', // blue-900
+                confirmButtonColor: '<%= primaryColor %>', // Dynamic primary color
                 confirmButtonText: 'OK',
                 customClass: {
                     popup: 'rounded-[28px]',
@@ -48,7 +48,7 @@
             text: text,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#1e3a8a',
+            confirmButtonColor: '<%= primaryColor %>',
             cancelButtonColor: '#d33',
             confirmButtonText: confirmText,
             cancelButtonText: 'Batal',
@@ -159,7 +159,7 @@
 
         // Update Bottom Nav
         document.querySelectorAll('.nav-item').forEach(el => {
-            el.classList.remove('text-blue-900');
+            el.classList.remove('text-primary');
             el.classList.add('text-gray-400');
             const iconWrapper = el.querySelector('div');
             if (iconWrapper) iconWrapper.classList.remove('scale-110');
@@ -168,20 +168,20 @@
         const activeNav = document.getElementById('nav-' + tabName);
         if (activeNav) {
             activeNav.classList.remove('text-gray-400');
-            activeNav.classList.add('text-blue-900');
+            activeNav.classList.add('text-primary');
             const iconWrapper = activeNav.querySelector('div');
             if (iconWrapper) iconWrapper.classList.add('scale-110');
         }
 
         // Update Desktop Nav
         document.querySelectorAll('.nav-link-desktop').forEach(el => {
-            el.classList.remove('text-blue-900', 'font-bold');
+            el.classList.remove('text-primary', 'font-bold');
             el.classList.add('text-gray-500');
         });
         const activeDesktop = document.querySelector(`.nav-link-desktop[data-target="${tabName}"]`);
         if(activeDesktop) {
             activeDesktop.classList.remove('text-gray-500');
-            activeDesktop.classList.add('text-blue-900', 'font-bold');
+            activeDesktop.classList.add('text-primary', 'font-bold');
         }
 
         // Trigger specific tab logic
