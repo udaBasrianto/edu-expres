@@ -736,6 +736,7 @@ exports.appSettingsPage = async (req, res) => {
 
 exports.updateAppSettings = async (req, res) => {
     try {
+        console.log('Update App Settings Request Body:', req.body);
         const { 
             app_name, app_slogan, theme_color, font_family, 
             blog_title, academy_slogan, academy_title, 
@@ -746,30 +747,42 @@ exports.updateAppSettings = async (req, res) => {
         let [settings] = await AppSetting.findOrCreate({ where: { key: 'default' } });
         
         settings.app_name = app_name || settings.app_name;
-        settings.app_slogan = app_slogan;
+        settings.app_slogan = app_slogan || settings.app_slogan;
         settings.theme_color = theme_color || 'blue';
-        settings.font_family = font_family;
-        settings.blog_title = blog_title;
-        settings.academy_slogan = academy_slogan;
-        settings.academy_title = academy_title;
-        settings.login_header_text = login_header_text;
+        settings.font_family = font_family || settings.font_family;
+        settings.blog_title = blog_title || settings.blog_title;
+        settings.academy_slogan = academy_slogan || settings.academy_slogan;
+        settings.academy_title = academy_title || settings.academy_title;
+        settings.login_header_text = login_header_text || settings.login_header_text;
         
-        // Add new fields (will be dynamically added to JSON or handled via model if updated)
-        settings.whatsapp = whatsapp;
-        settings.contact_email = contact_email;
-        settings.instagram = instagram;
-        settings.website = website;
+        settings.whatsapp = whatsapp || settings.whatsapp;
+        settings.contact_email = contact_email || settings.contact_email;
+        settings.instagram = instagram || settings.instagram;
+        settings.website = website || settings.website;
 
-        if (req.file) {
+        // Handle File Uploads (Expects upload.fields in route)
+        if (req.files) {
+            console.log('Detected files in request:', Object.keys(req.files));
+            if (req.files.logo && req.files.logo[0]) {
+                settings.logo_path = req.files.logo[0].filename;
+                console.log('Updated logo_path to:', settings.logo_path);
+            }
+            if (req.files.favicon && req.files.favicon[0]) {
+                settings.favicon_path = req.files.favicon[0].filename;
+                console.log('Updated favicon_path to:', settings.favicon_path);
+            }
+        } else if (req.file) {
+            // Fallback if somehow upload.single was used
             settings.logo_path = req.file.filename;
-            console.log('New logo uploaded:', req.file.filename);
+            console.log('Updated logo_path (fallback) to:', settings.logo_path);
         }
 
         await settings.save();
+        console.log('App settings successfully saved to database.');
         res.redirect('/admin/app-settings?success=true');
     } catch (e) {
         console.error('Update app settings error:', e);
-        res.redirect('/admin/app-settings?error=true');
+        res.redirect('/admin/app-settings?error=' + encodeURIComponent(e.message));
     }
 };
 

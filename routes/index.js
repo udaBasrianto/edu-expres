@@ -192,7 +192,10 @@ router.post('/admin/ai-settings/delete', isAdmin, adminController.deleteAiSettin
 
 // Admin App Settings
 router.get('/admin/app-settings', isAdmin, adminController.appSettingsPage);
-router.post('/admin/app-settings/update', isAdmin, upload.single('logo'), adminController.updateAppSettings);
+router.post('/admin/app-settings/update', isAdmin, upload.fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'favicon', maxCount: 1 }
+]), adminController.updateAppSettings);
 
 // Admin Product Messages
 router.get('/admin/product-messages', isAdmin, adminController.productMessagesPage);

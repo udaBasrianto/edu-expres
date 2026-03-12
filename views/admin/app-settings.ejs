@@ -62,6 +62,15 @@
                                                     <input name="logo" type="file" accept="image/*"
                                                         class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm">
                                         </div>
+                                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Favicon (ICO/PNG)</label>
+                                            <% if (settings.favicon_path) { %>
+                                                <img src="/uploads/<%= settings.favicon_path %>"
+                                                    class="w-10 h-10 rounded-lg object-contain mb-2 border border-slate-200"
+                                                    alt="Favicon">
+                                                <% } %>
+                                                    <input name="favicon" type="file" accept="image/*"
+                                                        class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm">
+                                        </div>
                                     </div>
                                 </div>
 
