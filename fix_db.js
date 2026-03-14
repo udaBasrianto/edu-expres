@@ -7,33 +7,25 @@ async function fix() {
         // 1. Disable checks
         await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
         
-        // 2. Identify and Drop problematic Foreign Keys
-        const dropFks = [
-            ['posts', 'posts_ibfk_1'],
-            ['materials', 'materials_course_id_foreign_idx'],
-            ['materials', 'materials_quiz_id_foreign_idx'],
-            ['quiz_attempts', 'quiz_attempts_user_id_foreign_idx'],
-            ['quiz_attempts', 'quiz_attempts_quiz_id_foreign_idx'],
-            ['cart_items', 'cart_items_user_id_foreign_idx'],
-            ['cart_items', 'cart_items_product_id_foreign_idx'],
-            ['cart_items', 'cart_items_course_id_foreign_idx'],
-            ['orders', 'orders_user_id_foreign_idx'],
-            ['order_items', 'order_items_order_id_foreign_idx'],
-            ['order_items', 'order_items_product_id_foreign_idx'],
-            ['order_items', 'order_items_course_id_foreign_idx'],
-            ['product_messages', 'product_messages_user_id_foreign_idx'],
-            ['product_messages', 'product_messages_product_id_foreign_idx'],
-            ['deposits', 'deposits_user_id_foreign_idx'],
-            ['deposits', 'deposits_bank_account_id_foreign_idx'],
-            ['quizzes', 'quizzes_certificate_template_id_foreign_idx']
-        ];
+        // 2. Dynamically Identify and Drop ALL Foreign Keys
+        const [databaseNameResult] = await sequelize.query("SELECT DATABASE() as db");
+        const dbName = databaseNameResult[0].db;
 
-        for (const [table, fk] of dropFks) {
+        const [fks] = await sequelize.query(`
+            SELECT TABLE_NAME, CONSTRAINT_NAME 
+            FROM information_schema.KEY_COLUMN_USAGE 
+            WHERE TABLE_SCHEMA = '${dbName}' 
+            AND REFERENCED_TABLE_NAME IS NOT NULL
+        `);
+
+        console.log(`Found ${fks.length} foreign keys to drop...`);
+
+        for (const fk of fks) {
             try {
-                await sequelize.query(`ALTER TABLE ${table} DROP FOREIGN KEY ${fk}`);
-                console.log(`Dropped FK ${fk} from ${table}`);
+                await sequelize.query(`ALTER TABLE ${fk.TABLE_NAME} DROP FOREIGN KEY ${fk.CONSTRAINT_NAME}`);
+                console.log(`Dropped FK ${fk.CONSTRAINT_NAME} from ${fk.TABLE_NAME}`);
             } catch (e) {
-                // Ignore if doesn't exist
+                console.log(`Failed to drop FK ${fk.CONSTRAINT_NAME}: ${e.message}`);
             }
         }
 
