@@ -35,7 +35,8 @@ async function fix() {
             'quiz_options', 'quiz_attempts', 'products', 'categories', 
             'cart_items', 'orders', 'order_items', 'posts', 'banners', 
             'deposits', 'bank_accounts', 'ai_settings', 'app_settings', 
-            'certificate_templates', 'product_messages', 'material_completions'
+            'certificate_templates', 'product_messages', 'material_completions',
+            'course_user'
         ];
 
         for (const table of tables) {
@@ -69,7 +70,9 @@ async function fix() {
             ['deposits', 'bank_account_id'],
             ['quizzes', 'certificate_template_id'],
             ['material_completions', 'user_id'],
-            ['material_completions', 'material_id']
+            ['material_completions', 'material_id'],
+            ['course_user', 'user_id'],
+            ['course_user', 'course_id']
         ];
 
         for (const [table, col] of fkCols) {
