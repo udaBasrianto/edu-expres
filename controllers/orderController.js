@@ -104,6 +104,7 @@ exports.checkout = async (req, res) => {
             success: true,
             message: 'Pesanan berhasil dibuat.',
             order_id: order.id,
+            total_amount: totalAmount,
         });
     } catch (error) {
         await t.rollback();

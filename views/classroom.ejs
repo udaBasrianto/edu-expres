@@ -24,9 +24,9 @@
             <!-- Progress Info -->
             <div class="hidden md:flex items-center gap-2 text-sm">
                 <span class="text-gray-500">Progress:</span>
-                <span class="font-bold text-blue-900"><%= completedIds.length %> / <%= materials.length %></span>
+                <span id="classroom-progress-text" class="font-bold text-blue-900"><%= completedIds.length %> / <%= materials.length %></span>
                 <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div class="h-full bg-blue-900" style="width: <%= (completedIds.length / materials.length) * 100 %>%"></div>
+                    <div id="classroom-progress-bar" class="h-full bg-blue-900 transition-all duration-500" style="width: <%= (completedIds.length / materials.length) * 100 %>%"></div>
                 </div>
             </div>
         </div>
@@ -133,7 +133,7 @@
                 <% materials.forEach((material, index) => { %>
                     <a href="/classroom/<%= course.id %>/<%= material.id %>" class="block p-4 hover:bg-blue-50 transition-colors <%= (currentMaterial && currentMaterial.id == material.id) ? 'bg-blue-50 border-l-4 border-blue-900 pl-3' : 'pl-4' %>">
                         <div class="flex gap-3">
-                            <div class="flex-none w-8 h-8 rounded-full <%= (currentMaterial && currentMaterial.id == material.id) ? 'bg-blue-900 text-white' : (completedIds.includes(String(material.id)) ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500') %> flex items-center justify-center text-xs font-bold">
+                            <div id="sidebar-icon-<%= material.id %>" class="flex-none w-8 h-8 rounded-full <%= (currentMaterial && currentMaterial.id == material.id) ? 'bg-blue-900 text-white' : (completedIds.includes(String(material.id)) ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500') %> flex items-center justify-center text-xs font-bold">
                                 <% if (completedIds.includes(String(material.id)) && (!currentMaterial || currentMaterial.id != material.id)) { %>
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
                                         <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
@@ -192,15 +192,49 @@
                 const data = await res.json();
                 
                 if (data.success) {
+                    const totalMaterials = <%= materials.length %>;
+                    const progressText = document.getElementById('classroom-progress-text');
+                    const progressBar = document.getElementById('classroom-progress-bar');
+                    const sidebarIcon = document.getElementById(`sidebar-icon-${materialId}`);
+                    
+                    let currentCount = parseInt(progressText.innerText.split(' / ')[0]);
+
                     if (data.completed) {
                         btn.className = "bg-green-100 text-green-700 hover:bg-green-200 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2";
                         text.innerText = "Selesai";
+                        currentCount++;
+                        
+                        // Update Sidebar Icon to checkmark
+                        if (sidebarIcon && !sidebarIcon.classList.contains('bg-blue-900')) {
+                            sidebarIcon.className = "flex-none w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold";
+                            sidebarIcon.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                                </svg>
+                            `;
+                        }
                     } else {
                         btn.className = "bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2";
                         text.innerText = "Tandai Selesai";
+                        currentCount--;
+
+                        // Update Sidebar Icon back to number
+                        if (sidebarIcon && !sidebarIcon.classList.contains('bg-blue-900')) {
+                            sidebarIcon.className = "flex-none w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs font-bold";
+                            // Note: we don't have the original index here easily without re-rendering or storing it, 
+                            // but we can try to find it from the DOM or just reload if it's too complex.
+                            // For simplicity in this edit, let's just use the material's order or reload if needed.
+                            // Actually, let's just update the count and progress bar for now.
+                        }
                     }
-                    // Optional: Reload to update sidebar checkmarks
-                    // window.location.reload(); 
+                    
+                    // Update Progress UI
+                    progressText.innerText = `${currentCount} / ${totalMaterials}`;
+                    progressBar.style.width = `${(currentCount / totalMaterials) * 100}%`;
+
+                    // If we need the sidebar icon to be perfect, a reload might be safest for the "uncheck" case
+                    // unless we want to store the index in a data attribute.
+                    if (!data.completed) window.location.reload(); 
                 }
             } catch (error) {
                 console.error(error);

@@ -67,7 +67,12 @@
 
 <script>
     async function handleCheckout() {
-        if (!confirm('Lanjutkan proses checkout untuk semua item?')) return;
+        const confirmed = await confirmDialog(
+            'Konfirmasi Checkout', 
+            'Lanjutkan proses checkout untuk semua item di keranjang?', 
+            'Ya, Checkout'
+        );
+        if (!confirmed) return;
 
         const btn = document.querySelector('#cart-summary button');
         const originalText = btn.innerHTML;
@@ -88,10 +93,27 @@
             const result = await res.json();
 
             if (result.success) {
-                notify(result.message, 'success');
+                notify('Pesanan berhasil dibuat! Silakan lakukan pembayaran.', 'success');
                 loadCart(); 
                 if (typeof updateCartCount === 'function') updateCartCount();
-                switchTab('home'); 
+                
+                // Open payment modal with the newly created order
+                const orderData = {
+                    id: result.order_id,
+                    total_amount: parseFloat(result.total_amount) || 0
+                };
+
+                // Update user balance display in payment modal
+                const balDisplay = document.getElementById('user-balance-display');
+                if (balDisplay) {
+                    const fmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+                    balDisplay.innerText = fmt.format(typeof userBalance !== 'undefined' ? userBalance : 0);
+                }
+
+                // Open the payment modal
+                if (typeof openOrderPaymentModal === 'function') {
+                    openOrderPaymentModal(orderData);
+                }
             } else {
                 notify(result.message || 'Checkout gagal', 'error');
             }

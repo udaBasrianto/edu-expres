@@ -1,4 +1,5 @@
 const Course = require('../models/Course');
+const Material = require('../models/Material');
 const AppSetting = require('../models/AppSetting');
 
 const CourseUser = require('../models/CourseUser');

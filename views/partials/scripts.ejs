@@ -3,6 +3,7 @@
 
 <script>
     const isAuthenticated = <%= user ? 'true' : 'false' %>;
+    const userBalance = <%= user && user.balance ? user.balance : 0 %>;
 
     // Modern Notification Helper
     const Toast = Swal.mixin({
@@ -196,6 +197,8 @@
             .then(res => res.json())
             .then(data => {
                 const badges = document.querySelectorAll('.cart-badge');
+                const cartSummaryBadge = document.querySelector('#cart-item-count-badge span');
+                
                 badges.forEach(b => {
                     b.innerText = data.count;
                     if (data.count > 0) {
@@ -204,6 +207,10 @@
                         b.classList.add('hidden');
                     }
                 });
+
+                if (cartSummaryBadge) {
+                    cartSummaryBadge.innerText = `${data.count} Items`;
+                }
             })
             .catch(err => console.error('Failed to update cart count:', err));
     }
